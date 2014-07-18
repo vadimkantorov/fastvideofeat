@@ -16,7 +16,7 @@ If you use this code, please cite our work:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year = {2014}  
 }
 
-The paper and the poster are available at [the project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository.
+The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository.
 
 For any question or bug report, please contact Vadim Kantorov at vadim.kantorov@inria.fr or vadim.kantorov@gmail.com
 
