@@ -22,9 +22,9 @@ For any question or bug report, please contact Vadim Kantorov at vadim.kantorov@
 Description and usage
 =====================
 
-We release two tools in this repository. The first tool **motion_descriptors** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fv_fast** that uses vector SSE2 CPU instructions.
+We release two tools in this repository. The first tool **fastvideofeat** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fastfv** that uses vector SSE2 CPU instructions.
 
-### motion_descriptors
+### fastvideofeat
 
 The tool accepts a video file path as input and writes descriptors to standard output.  
 ##### Command-line options:
@@ -55,12 +55,12 @@ The standard error contains various debug / diagnostic messages like time measur
 
 ##### Examples:
   - Compute HOG, HOF, MBH and save the descriptors in descriptors.txt:
-    > $ ./motion_descriptors -i video.avi > descriptors.txt
+    > $ ./fastvideofeat -i video.avi > descriptors.txt
 
   - Compute only HOF and MBH from the first 500 frames and save the descriptors in descriptors.txt:
-    > $ ./motion_descriptors -i video.avi -hog no -hof yes -mbh yes -f 1-500 > descriptors.txt
+    > $ ./fastvideofeat -i video.avi -hog no -hof yes -mbh yes -f 1-500 > descriptors.txt
 
-### fv_fast
+### fastfv
 The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output or a specified HDF5 file.
 ##### Command-line options:
 
@@ -82,10 +82,10 @@ Option | Default | Description
 
 ##### Examples:
   - Build GMM vocabulary:
-    > $ cat descriptors.txt | ./fv_fast --buildGmmIndex
+    > $ cat descriptors.txt | ./fastfv --buildGmmIndex
 
   - Compute Fisher vector:
-    > $ cat descriptors.txt | ./fv_fast 
+    > $ cat descriptors.txt | ./fastfv 
 
 Building from source
 ====================
@@ -96,11 +96,11 @@ Make sure you have the dependencies installed and visible to the CC compiler (no
 
 The binaries will be placed in the **build** sub-directory.
 
-Dependencies for **motion_descriptors**:
+Dependencies for **fastvideofeat**:
  - opencv (http://opencv.org)
  - ffmpeg (http://ffmpeg.org)
 
-Dependencies for **fv_fast**:
+Dependencies for **fastfv**:
  - opencv (http://opencv.org)
  - yael (http://gforge.inria.fr/projects/yael/) [optional, needed for computing the GMM vocab]
  - hdf5 (http://www.hdfgroup.org/HDF5/) [optional, needed for saving the output to an HDF5 file]
