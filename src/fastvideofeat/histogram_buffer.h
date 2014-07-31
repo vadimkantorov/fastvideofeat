@@ -1,7 +1,6 @@
 #include <vector>
 #include <utility>
 
-#include <opencv2/flann/kmeans_index.h>
 #include <opencv/cv.h>
 
 #include "integral_transform.h"
@@ -149,10 +148,7 @@ struct HofMbhBuffer
 		if(hofInfo.enabled)
 		{
 			TIMERS.HofComputation.Start();
-			if(!frame.WarpDx.empty() && !frame.WarpDy.empty())
-				hof.Update(frame.WarpDx, frame.WarpDy);
-			else
-				hof.Update(frame.Dx, frame.Dy);
+			hof.Update(frame.Dx, frame.Dy);
 			TIMERS.HofComputation.Stop();
 		}
 
@@ -265,15 +261,7 @@ struct HofMbhBuffer
 		{
 			TIMERS.Writing.Start();
 			PrintPatchDescriptorHeader(rect);
-			/*if(printQuantized)
-			{
-				quantizer.Quantize(patchDescriptor, quantized);
-				PrintIntegerArray(quantized);
-			}
-			else
-			{*/
-				PrintFloatArray(patchDescriptor);
-			//}
+			PrintFloatArray(patchDescriptor);
 			
 			printf("\n");
 			TIMERS.Writing.Stop();

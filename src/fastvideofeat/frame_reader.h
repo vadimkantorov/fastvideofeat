@@ -14,7 +14,7 @@ extern "C"
 #include <string>
 #include "common.h"
 #include "diag.h"
-#include "../Commons/motion_vector_file_utils.h"
+#include "motion_vector_file_utils.h"
 #include <opencv/cv.h>
 
 using namespace std;
