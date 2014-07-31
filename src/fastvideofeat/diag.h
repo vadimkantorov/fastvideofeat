@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <ctime>
 
-#include "../Commons/timing.h"
+#include "../commons/timing.h"
 
 #ifndef __DIAG_H__
 #define __DIAG_H__

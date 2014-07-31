@@ -11,7 +11,7 @@
 #include "diag.h"
 #include "opencv_utils.h"
 #include "io_utils.h"
-#include "../Commons/log.h"
+#include "../commons/log.h"
 #include "spm_fv.h"
 
 #include "config.h"

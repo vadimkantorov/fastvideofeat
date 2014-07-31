@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "../Commons/timing.h"
+#include "../commons/timing.h"
 #include "options.h"
 
 using namespace std;

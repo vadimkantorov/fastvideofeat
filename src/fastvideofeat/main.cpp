@@ -5,7 +5,7 @@
 #include <opencv/cxcore.h>
 
 #include "motion_vector_file_utils.h"
-#include "../Commons/log.h"
+#include "../commons/log.h"
 #include "frame_reader.h"
 #include "histogram_buffer.h"
 #include "desc_info.h"
