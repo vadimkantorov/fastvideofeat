@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include "grid_part.h"
 
-#include "../Commons/io_utils.h"
+#include "io_utils.h"
 #include "config.h"
 
 using namespace std;
@@ -34,12 +34,8 @@ struct Options
 	string OutputFilePath;
 	string FV_CONFIG;
 
-	bool DebugMode;
-
 	void Explain()
 	{
-		if(DebugMode)
-			fprintf(stderr, "We're in DEBUG mode\n");
 		fprintf(stderr, "Options:\n");
 		fprintf(stderr, "Indices are zero-based\n");
 		for(int i = 0; i < Parts.size(); i++)
@@ -223,7 +219,6 @@ struct Options
 
 	void SetDefaults()
 	{
-		DebugMode = false;
 		BuildGmmIndex = false;
 		GmmK = 256;
 		GmmNiter = 50;
@@ -283,10 +278,6 @@ struct Options
 
 	void SetDebugDefaults()
 	{
-		DebugMode = true;
-		//char* argv[] = {"", "../../config.txt", "--lambda", "1e-8", "--gmm_k", "256", "--knn", "5", "--outputFile", "out.npy", "--trees", "4", "--checks", "32"};
-		//ParseCommandLine(14, argv);
-		//freopen("../../data/features.txt", "r", stdin);
 	}
 
 	Options(int argc, char* argv[])
@@ -296,8 +287,7 @@ struct Options
 			SetDebugDefaults();
 		else
 			ParseCommandLine(argc, argv);
-		//if(DebugMode)
-			Explain();
+		Explain();
 		Check();
 	}
 };

@@ -1,12 +1,14 @@
 #include <opencv/cv.h>
 #include <string>
 
-#include "../Commons/opencv_utils.h"
+#include "opencv_utils.h"
 #include <cmath>
 
 extern "C"
 {
+	#if HAVE_YAEL
 	#include <yael/gmm.h>
+	#endif
 }
 
 using namespace std;
@@ -23,7 +25,6 @@ struct GmmVocab
 	float lambda;
 	
 	Mat_<float> mu, sigma, w;
-	static const int flags = GMM_FLAGS_MU | GMM_FLAGS_SIGMA | GMM_FLAGS_NO_NORM;
 
 	GmmVocab(string vocabPath, int k, float lambda) : vocabPath(vocabPath), k(k), lambda(lambda)
 	{
@@ -41,11 +42,6 @@ struct GmmVocab
 		return vocabPath + ".weights";
 	}
 
-	inline int sgn(float x)
-	{
-		return x > 0 ? 1 : -1;
-	}
-
 	void CheckRowMajor()
 	{
 		assert(mu.cols == k);
@@ -59,9 +55,6 @@ struct GmmVocab
 		ReadMatFromFile(sigma, GetCovariancesFilePath(vocabPath));
 		ReadMatFromFile(w, GetWeightsFilePath(vocabPath));
 
-		//ReadMatFromTextFileSlow("matlab/fv_mu.txt", mu);
-		//ReadMatFromTextFileSlow("matlab/fv_sigma.txt", sigma);
-		//ReadMatFromTextFileSlow("matlab/fv_w.txt", w);
 		CheckRowMajor();
 		
 		//converting from row-major to column-major to call yael
@@ -78,18 +71,17 @@ struct GmmVocab
 	
 	void BuildAndSaveIndex(Mat_<float> features, int niter = 50)
 	{
+		#if HAVE_YAEL
 		int d = features.cols;
 		int n = features.rows;
 		
 		const int nthreads = 1;
 		const int seed = 0;
 		const int redo = 1;
-#ifdef _MSC_VER
-		gmm_t* g = NULL;
-#else
 		//dimensions don't match but features is already in column-major
-		gmm_t* g = gmm_learn (d, n, k, niter, features.ptr<float>(), nthreads, seed, redo, flags); 
-#endif
+
+		int flags = GMM_FLAGS_MU | GMM_FLAGS_SIGMA | GMM_FLAGS_NO_NORM;
+		gmm_t* g = gmm_learn (d, n, k, niter, features.ptr<float>(), nthreads, seed, redo, flags);
 
 		w = Mat_<float>(k, 1, g->w, Mat::AUTO_STEP);
 		mu = Mat_<float>(k, d, g->mu, Mat::AUTO_STEP);
@@ -104,6 +96,7 @@ struct GmmVocab
 		WriteMatToTextFile(vocabPath, mu);
 		WriteMatToTextFile(GetCovariancesFilePath(vocabPath), sigma);
 		WriteMatToTextFile(GetWeightsFilePath(vocabPath), w);
+		#endif
 	}	
 };
 

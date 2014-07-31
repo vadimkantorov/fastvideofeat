@@ -25,7 +25,7 @@ ifneq ($(WITH_YAEL),OFF)
 else
 	echo '#define HAVE_YAEL 0' >> $(CONFIG_FILE)
 endif
-	$(CC) $(SOURCE_FILES) $(LIBS) $(CFLAGS) -I$(BUILD_DIR) -o $(BUILD_DIR)/fv_fast
+	$(CC) $(SOURCE_FILES) $(LIBS) $(CFLAGS) -I$(BUILD_DIR) -o $(BUILD_DIR)/fastfv
 
 clean:
 	rm -rf build

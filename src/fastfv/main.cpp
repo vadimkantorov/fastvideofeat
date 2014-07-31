@@ -9,15 +9,15 @@
 #include "gmm_vocab.h"
 #include "options.h"
 #include "diag.h"
-#include "../Commons/opencv_utils.h"
-#include "../Commons/io_utils.h"
+#include "opencv_utils.h"
+#include "io_utils.h"
 #include "../Commons/log.h"
 #include "spm_fv.h"
 
 #include "config.h"
 
-#ifdef HAVE_HDF5
-	#include "../Commons/hdf5opencv.h"
+#if HAVE_HDF5
+	#include "hdf5opencv.h"
 #endif
 
 #include <memory>
@@ -151,9 +151,10 @@ int main(int argc, char* argv[])
 		
 		for(int i = 0; i < parts.size(); i++)
 		{
-			log("# part %d", i);
 			spms[i].ToString.push_back("ERR");
+#if HAVE_HDF5
 			hdf5opencv::write_integer_attributes(opts.OutputFilePath.c_str(), spms[i].ToString, spms[i].CellStats);
+#endif
 		}
 	}
 
