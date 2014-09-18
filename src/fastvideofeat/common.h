@@ -23,13 +23,14 @@ struct Frame
 	int FrameIndex;
 	int64_t PTS;
 	bool NoMotionVectors;
+	char PictType;
 
 	Frame(int frameIndex, Mat dx, Mat dy, Mat missing)
-		: FrameIndex(frameIndex), Dx(dx), Dy(dy), Missing(missing), NoMotionVectors(false), PTS(-1)
+		: FrameIndex(frameIndex), Dx(dx), Dy(dy), Missing(missing), NoMotionVectors(false), PTS(-1), PictType('?')
 	{
 	}
 
-	Frame(int frameIndex = -1) : FrameIndex(frameIndex), NoMotionVectors(true), PTS(-1)
+	Frame(int frameIndex = -1) : FrameIndex(frameIndex), NoMotionVectors(true), PTS(-1), PictType('?')
 	{
 	}
 

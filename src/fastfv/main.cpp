@@ -14,11 +14,7 @@
 #include "../commons/log.h"
 #include "spm_fv.h"
 
-#include "config.h"
-
-#if HAVE_HDF5
-	#include "hdf5opencv.h"
-#endif
+//#include "hdf5opencv.h"
 
 #include <memory>
 
@@ -26,7 +22,7 @@ using namespace std;
 
 void Print(vector<string>& comments, Mat_<float>& fv, string& outputFile)
 {
-	if(!outputFile.empty() && GetFileExtension(outputFile) == ".h5")
+	/*if(!outputFile.empty() && GetFileExtension(outputFile) == ".h5")
 	{
 		#if HAVE_HDF5
 		static bool firstTime = true;
@@ -39,7 +35,7 @@ void Print(vector<string>& comments, Mat_<float>& fv, string& outputFile)
 		}
 		#endif
 	}
-	else
+	else*/
 	{
 		FILE* out = outputFile != "" ? fopen(outputFile.c_str(), "w") : stdout;
 		for(int i = 0; i < comments.size(); i++)

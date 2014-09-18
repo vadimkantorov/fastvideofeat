@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 		if(frame.PTS == -1)
 			break;
 
-		log("#read frame pts=%d", frame.PTS);
+		log("#read frame pts=%d, mvs=%s, type=%c", frame.PTS, frame.NoMotionVectors ? "no" : "yes", frame.PictType);
 
 		if(opts.GoodPts.empty() || count(opts.GoodPts.begin(), opts.GoodPts.end(), frame.PTS) == 1)
 		{
@@ -68,7 +68,6 @@ int main(int argc, char* argv[])
 			
 			if(frame.NoMotionVectors || (hogInfo.enabled && frame.RawImage.empty()))
 			{
-				log("#skipping");
 				TIMERS.SkippedFrames++;
 				continue;
 			}
@@ -85,7 +84,6 @@ int main(int argc, char* argv[])
 					int blockHeight = patchSizes[k].height / cellSize;
 					int xStride = opts.Dense ? 1 : blockWidth / 2;
 					int yStride = opts.Dense ? 1 : blockHeight / 2;
-					log("#cellSize: %d, blockWidth: %d, blockHeight: %d, xStride: %d, yStride: %d", cellSize, blockWidth, blockHeight, xStride, yStride);
 					buffer.PrintFullDescriptor(blockWidth, blockHeight, xStride, yStride);
 				}
 			}

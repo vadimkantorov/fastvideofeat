@@ -6,9 +6,7 @@
 
 extern "C"
 {
-	#if HAVE_YAEL
 	#include <yael/gmm.h>
-	#endif
 }
 
 using namespace std;
@@ -71,7 +69,6 @@ struct GmmVocab
 	
 	void BuildAndSaveIndex(Mat_<float> features, int niter = 50)
 	{
-		#if HAVE_YAEL
 		int d = features.cols;
 		int n = features.rows;
 		
@@ -96,7 +93,6 @@ struct GmmVocab
 		WriteMatToTextFile(vocabPath, mu);
 		WriteMatToTextFile(GetCovariancesFilePath(vocabPath), sigma);
 		WriteMatToTextFile(GetWeightsFilePath(vocabPath), w);
-		#endif
 	}	
 };
 

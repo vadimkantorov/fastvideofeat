@@ -8,7 +8,6 @@
 #include "grid_part.h"
 
 #include "io_utils.h"
-#include "config.h"
 
 using namespace std;
 
@@ -240,11 +239,6 @@ struct Options
 		{
 			string suffix = GetFileExtension(OutputFilePath);
 			assert(suffix == ".txt" || suffix == ".h5");
-			if(suffix == ".h5" && !HAVE_HDF5)
-			{
-				fprintf(stderr, "FATAL: --outputFile '%s' cannot be used without the HDF5 library\n", OutputFilePath.c_str());
-				exit(1);
-			}
 		}
 
 		if(!BuildGmmIndex)
@@ -254,14 +248,7 @@ struct Options
 			assert(TnPos != -1);
 			assert(Grids.size() > 0);
 		}
-		else
-		{
-			if(!HAVE_YAEL)
-			{
-				fprintf(stderr, "FATAL: --buildGmmIndex cannot be used without the YAEL library\n");
-				exit(1);
-			}
-		}
+		
 
 		assert(Parts.size() > 0);
 		assert(GmmK > 0);
