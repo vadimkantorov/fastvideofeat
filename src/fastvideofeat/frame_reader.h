@@ -5,6 +5,7 @@ extern "C"
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
+#include <libavutil/motion_vector.h>
 }
 
 #include <cstdio>
@@ -19,22 +20,6 @@ extern "C"
 
 using namespace std;
 using namespace cv;
-
-//following macros come from mpegvideo.h
-#define IS_PCM(a)        ((a)&MB_TYPE_INTRA_PCM)
-#define IS_INTERLACED(a) ((a)&MB_TYPE_INTERLACED)
-#define IS_16X16(a)      ((a)&MB_TYPE_16x16)
-#define IS_16X8(a)       ((a)&MB_TYPE_16x8)
-#define IS_8X16(a)       ((a)&MB_TYPE_8x16)
-#define IS_8X8(a)        ((a)&MB_TYPE_8x8)
-#define USES_LIST(a, list) ((a) & ((MB_TYPE_P0L0|MB_TYPE_P1L0)<<(2*(list))))
-#define IS_INTRA(a)      ((a)&7)
-#define IS_INTRA4x4(a)   ((a)&MB_TYPE_INTRA4x4)
-#define IS_DIRECT(a)     ((a)&MB_TYPE_DIRECT2)
-#define IS_GMC(a)        ((a)&MB_TYPE_GMC)
-#define IS_INTRA16x16(a) ((a)&MB_TYPE_INTRA16x16)
-#define IS_ACPRED(a)     ((a)&MB_TYPE_ACPRED)
-#define IS_SKIP(a)       ((a)&MB_TYPE_SKIP)
 
 #ifndef __FRAME_READER_H__
 #define __FRAME_READER_H__
@@ -138,13 +123,15 @@ struct FrameReader
 
 				//if (pCodec->capabilities & CODEC_CAP_TRUNCATED)
 				//	pCodecCtx->flags |= CODEC_FLAG_TRUNCATED;
-
-				if (!pCodec || avcodec_open2(enc, pCodec, NULL) < 0)
+				AVDictionary *opts = NULL;
+				av_dict_set(&opts, "flags2", "+export_mvs", 0);
+				if (!pCodec || avcodec_open2(enc, pCodec, &opts) < 0)
 					throw std::runtime_error("Codec not found or cannot open codec");
 
 				videoStream = i;
 				video_st = pFormatCtx->streams[i];
-				pFrame = avcodec_alloc_frame();
+				//pFrame = avcodec_alloc_frame();
+				pFrame = av_frame_alloc();
 
 				int cols = enc->width;
 				int rows = enc->height;
@@ -219,7 +206,7 @@ struct FrameReader
 
 	bool process_frame(AVPacket *pkt)
 	{
-		avcodec_get_frame_defaults(pFrame);
+		av_frame_unref(pFrame);
 
 		int got_frame = 0;
 		int ret = avcodec_decode_video2(video_st->codec, pFrame, &got_frame, pkt);
@@ -251,49 +238,8 @@ struct FrameReader
 		}
 	}
 
-	void InitMotionVector(MotionVector& mv, int sx, int sy, int mx, int my, int dx, int dy, int mb_type)
+	void InitMotionVector(MotionVector& mv, int sx, int sy, int dx, int dy)
 	{
-		char typeCode = '_';
-		if (IS_PCM(mb_type))
-			typeCode = 'P';
-		else if (IS_INTRA(mb_type) && IS_ACPRED(mb_type))
-			typeCode = 'A';
-		else if (IS_INTRA4x4(mb_type))
-			typeCode = 'i';
-		else if (IS_INTRA16x16(mb_type))
-			typeCode = 'I';
-		else if (IS_DIRECT(mb_type) && IS_SKIP(mb_type))
-			typeCode = 'd';
-		else if (IS_DIRECT(mb_type))
-			typeCode = 'D';
-		else if (IS_GMC(mb_type) && IS_SKIP(mb_type))
-			typeCode = 'g';
-		else if (IS_GMC(mb_type))
-			typeCode = 'G';
-		else if (IS_SKIP(mb_type))
-			typeCode = 'S';
-		else if (!USES_LIST(mb_type, 1))
-			typeCode = '>';
-		else if (!USES_LIST(mb_type, 0))
-			typeCode = '<';
-		else {
-			assert(USES_LIST(mb_type, 0) && USES_LIST(mb_type, 1));
-			typeCode = 'X';
-		}
-
-		char segmCode = '_';
-		// segmentation
-		if (IS_8X8(mb_type))
-			segmCode = '+';
-		else if (IS_16X8(mb_type))
-			segmCode = '-';
-		else if (IS_8X16(mb_type))
-			segmCode = '|';
-		else if (IS_INTRA(mb_type) || IS_16X16(mb_type))
-			segmCode = ' ';
-		else
-			segmCode = '?';
-
 		//inverting vectors to match optical flow directions
 		dx = -dx;
 		dy = -dy;
@@ -302,135 +248,25 @@ struct FrameReader
 		mv.Y = sy;
 		mv.Dx = dx;
 		mv.Dy = dy;
-		mv.Mx = mx*16;
-		mv.My = my*16;
-		mv.TypeCode = typeCode;
-		mv.SegmCode = segmCode;
+		mv.Mx = -1;
+		mv.My = -1;
+		mv.TypeCode = '?';
+		mv.SegmCode = '?';
 	}
 
 	void ReadMotionVectors(Frame& f)
 	{
-		AVCodecContext* pCodecCtx = video_st->codec;
-
-		const int mb_width  = (pCodecCtx->width + 15) / 16;
-		const int mb_height = (pCodecCtx->height + 15) / 16;
-		const int mb_stride = mb_width + 1;
-		const int mv_sample_log2 = 4 - pFrame->motion_subsample_log2;
-		const int mv_stride = (mb_width << mv_sample_log2) + (pCodecCtx->codec_id == CODEC_ID_H264 ? 0 : 1);
-		const int quarter_sample = (pCodecCtx->flags & CODEC_FLAG_QPEL) != 0;
-		const int shift = 1 + quarter_sample;
-
-		typedef short DCTELEM;
-		//Mat_<DCTELEM> dct(mb_height*mb_width, 64*6);
-		//memcpy(dct.ptr(), pFrame->dct_coeff, sizeof(DCTELEM)*dct.cols);
+		// reading motion vectors, see ff_print_debug_info2 in ffmpeg's libavcodec/mpegvideo.c for reference and a fresh doc/examples/extract_mvs.c
+		AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MOTION_VECTORS);
+		
+		AVMotionVector* mvs = (AVMotionVector*)sd->data;
+		int mbcount = sd->size / sizeof(AVMotionVector);
 		MotionVector mv;
-		for (int mb_y = 0; mb_y < mb_height; mb_y++)
+		for(int i = 0; i < mbcount; i++)
 		{
-			for (int mb_x = 0; mb_x < mb_width; mb_x++)
-			{
-				const int mb_index = mb_x + mb_y * mb_stride;
-
-				if (pFrame->motion_val)
-				{
-					for (int type = 0; type < 3; type++)
-					{
-						int direction = 0;
-						switch (type) {
-						case 0:
-							if (//(!(pCodecCtx->debug_mv & FF_DEBUG_VIS_MV_P_FOR)) ||
-								(pFrame->pict_type!= AV_PICTURE_TYPE_P))
-								continue;
-							direction = 0;
-							break;
-						case 1:
-							if (//(!(pCodecCtx->debug_mv & FF_DEBUG_VIS_MV_B_FOR)) ||
-								(pFrame->pict_type!= AV_PICTURE_TYPE_B))
-								continue;
-							direction = 0;
-							break;
-						case 2:
-							if (//(!(pCodecCtx->debug_mv & FF_DEBUG_VIS_MV_B_BACK)) ||
-								(pFrame->pict_type!= AV_PICTURE_TYPE_B))
-								continue;
-							direction = 1;
-							break;
-						}
-
-						bool good = USES_LIST(pFrame->mb_type[mb_index], direction);
-						int dx = NO_MV;
-						int dy = NO_MV;
-
-						if (IS_8X8(pFrame->mb_type[mb_index]))
-						{
-							for (int i = 0; i < 4; i++)
-							{
-								int sx = mb_x * 16 + 4 + 8 * (i & 1);
-								int sy = mb_y * 16 + 4 + 8 * (i >> 1);
-								if(good)
-								{
-									int xy = (mb_x*2 + (i&1) + (mb_y*2 + (i>>1))*mv_stride) << (mv_sample_log2-1);
-									dx = (pFrame->motion_val[direction][xy][0]>>shift);
-									dy = (pFrame->motion_val[direction][xy][1]>>shift);
-								}
-								InitMotionVector(mv, sx, sy, mb_x, mb_y, dx, dy, pFrame->mb_type[mb_index]);
-								PutMotionVectorInMatrix(mv, f);
-							}
-						}
-						else if (IS_16X8(pFrame->mb_type[mb_index]))
-						{
-							for (int i = 0; i < 2; i++)
-							{
-								int sx = mb_x * 16 + 8;
-								int sy = mb_y * 16 + 4 + 8 * i;
-								if(good)
-								{
-									int xy = (mb_x*2 + (mb_y*2 + i)*mv_stride) << (mv_sample_log2-1);
-									dx = (pFrame->motion_val[direction][xy][0]>>shift);
-									dy = (pFrame->motion_val[direction][xy][1]>>shift);
-
-									if (IS_INTERLACED(pFrame->mb_type[mb_index]))
-										dy *= 2;
-								}
-
-								InitMotionVector(mv, sx, sy, mb_x, mb_y, dx, dy, pFrame->mb_type[mb_index]);
-								PutMotionVectorInMatrix(mv, f);
-							}
-						}
-						else if (IS_8X16(pFrame->mb_type[mb_index]))
-						{
-							for (int i = 0; i < 2; i++) 
-							{
-								int sx = mb_x * 16 + 4 + 8 * i;
-								int sy = mb_y * 16 + 8;
-								if(good)
-								{
-									int xy =  (mb_x*2 + i + mb_y*2*mv_stride) << (mv_sample_log2-1);
-									dx = (pFrame->motion_val[direction][xy][0]>>shift);
-									dy = (pFrame->motion_val[direction][xy][1]>>shift);
-
-									if (IS_INTERLACED(pFrame->mb_type[mb_index]))
-										dy *= 2;
-								}
-								InitMotionVector(mv, sx, sy, mb_x, mb_y, dx, dy, pFrame->mb_type[mb_index]);
-								PutMotionVectorInMatrix(mv, f);
-							}
-						}
-						else
-						{
-							int sx= mb_x * 16 + 8;
-							int sy= mb_y * 16 + 8;
-							if(good)
-							{
-								int xy = (mb_x + mb_y*mv_stride) << mv_sample_log2;
-								dx = (pFrame->motion_val[direction][xy][0]>>shift);
-								dy = (pFrame->motion_val[direction][xy][1]>>shift);
-							}
-							InitMotionVector(mv, sx, sy, mb_x, mb_y, dx, dy, pFrame->mb_type[mb_index]);
-							PutMotionVectorInMatrix(mv, f);
-						}
-					}
-				}
-			}
+			AVMotionVector& mb = mvs[i];
+			InitMotionVector(mv, mb.src_x, mb.src_y, mb.dst_x - mb.src_x, mb.dst_y - mb.src_y);
+			PutMotionVectorInMatrix(mv, f);
 		}
 	}
 
@@ -452,10 +288,8 @@ struct FrameReader
 		bool read = GetNextFrame();
 		if(read)
 		{
-			AVPictureType tp = pFrame->pict_type;
-			char picType = tp == AV_PICTURE_TYPE_I ? 'I' : tp == AV_PICTURE_TYPE_B ? 'B' : tp == AV_PICTURE_TYPE_P ? 'P' : '?';
-
-			res.NoMotionVectors = picType == 'I';
+			res.NoMotionVectors = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MOTION_VECTORS) == NULL;
+			res.PictType = av_get_picture_type_char(pFrame->pict_type);
 			//fragile, consult fresh f_select.c and ffprobe.c when updating ffmpeg
 			res.PTS = pFrame->pkt_pts != AV_NOPTS_VALUE ? pFrame->pkt_pts : (pFrame->pkt_dts != AV_NOPTS_VALUE ? pFrame->pkt_dts : prev_pts + 1);
 			prev_pts = res.PTS;
@@ -486,7 +320,7 @@ struct FrameReader
 			av_free(pAvio_buffer);*/
 		/*if(pAvioContext)
 			av_free(pAvioContext);*/
-		if(in)
+				if(in)
 			fclose(in);
 	}
 };

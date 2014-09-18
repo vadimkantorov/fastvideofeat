@@ -7,24 +7,13 @@ LDFLAGS =	-lopencv_core \
 		-lhdf5
 
 BUILD_DIR = build
-CONFIG_FILE = $(BUILD_DIR)/config.h
+
+INSTALLED_DEPS = -I../../3rdparty/include -L../../3rdparty/lib 
 
 all: $(SOURCE_FILES)
 	mkdir -p $(BUILD_DIR)
-	echo > $(CONFIG_FILE)
 
-ifneq ($(WITH_HDF5),OFF)
-	echo '#define HAVE_HDF5 1' >> $(CONFIG_FILE)
-else
-	echo '#define HAVE_HDF5 0' >> $(CONFIG_FILE)
-endif
-
-ifneq ($(WITH_YAEL),OFF)
-	echo '#define HAVE_YAEL 1' >> $(CONFIG_FILE)
-else
-	echo '#define HAVE_YAEL 0' >> $(CONFIG_FILE)
-endif
-	$(CXX) $(SOURCE_FILES) -I$(BUILD_DIR) -o $(BUILD_DIR)/fastfv $(CFLAGS) $(LDFLAGS)
+	$(CXX) $(SOURCE_FILES) -I$(BUILD_DIR) -o $(BUILD_DIR)/fastfv $(CFLAGS) $(LDFLAGS) $(INSTALLED_DEPS)
 
 clean:
 	rm -rf $(BUILD_DIR)
