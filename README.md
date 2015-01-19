@@ -28,7 +28,7 @@ Description and usage
 
 We release two tools in this repository. The first tool **fastvideofeat** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fastfv** that uses vector SSE2 CPU instructions.
 
-We also release scripts (in the repro directory) for reproducing our results on Hollywood-2 datast.
+We also release scripts (in the *repro* directory) for reproducing our results on Hollywood-2 datast.
 
 ### fastvideofeat
 
@@ -112,7 +112,7 @@ Dependencies for **fastfv**:
  - opencv (http://opencv.org)
  - yael (http://gforge.inria.fr/projects/yael/) [needed for reading the GMM vocab from a file]
 
-The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. A minimal script to download and install these libraries is in the 3rdparty directory.
+The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. A minimal script to download and install these libraries is in the *3rdparty* directory.
 
 ### Windows
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
