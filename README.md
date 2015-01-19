@@ -16,9 +16,11 @@ If you use this code, please cite our work:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year = {2014}  
 }
 
-The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository.
+The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository, the binaries are published on the repository [releases page](http://github.com/vadimkantorov/cvpr2014/releases).
 
-For any question or bug report, please contact Vadim Kantorov at vadim.kantorov@inria.fr or vadim.kantorov@gmail.com
+Please submit bugs on [GitHub](http://github.com/vadimkantorov/cvpr2014/issues) directly.
+
+For any other question, please contact Vadim Kantorov at vadim.kantorov@inria.fr or vadim.kantorov@gmail.com.
 
 
 Description and usage
