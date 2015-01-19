@@ -1,7 +1,8 @@
 This is a set of scripts to reproduce the Hollywood-2 results, with time
 measurement.
 
-==Prerequisites==
+Prerequisites
+=====================
 
  - 64-bit *nix, 800 Gb of free disk space, several gigs of RAM
  - Python, NumPy, octave, scikits-learn, PyYAML, oct2py, octave
@@ -10,7 +11,8 @@ measurement.
  - VLfeat 0.9.19. To download and unpack it automatically, run:
    $ make get_vlfeat
 
-==Instructions==
+Instructions
+=====================
 
 Make sure all prerequisites are in place. Study the Makefile (paths for fastvideofeat/fastfv and libs they need are set in the beginning), and then run the repro with:
 $ make --jobs 8
