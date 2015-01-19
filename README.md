@@ -91,6 +91,7 @@ Option | Default | Description
 
 ##### Examples:
   - Compute Fisher vector:
+
     > $ zcat sample_features_mpeg4.txt.gz | ./fastfv --vocab 9-104 hollywood2_sample_vocabs/hog_K256.gmm --vocab 105-212 hollywood2_sample_vocabs/hof_K256.gmm --vocab 213-308 hollywood2_sample_vocabs/mbhx_K256.gmm --vocab 309-404 hollywood2_sample_vocabs/mbhy_K256.gmm --xnpos 0 --ynpos 1 --tnpos 2 --grid 1x1x1x --grid 2x2x1x --grid 1x3x1x --grid 1x1x2x --grid 2x2x2x --grid 1x3x2x --ttot 192 > fv.txt
 
 Examples are explained in samples/compute_fisher_vector.sh. 
