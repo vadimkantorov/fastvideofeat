@@ -1,7 +1,6 @@
-This is a set of scripts to reproduce the Hollywood-2 results, with time
-measurement.
+Reproducing Hollywood-2 results
 
-# Prerequisites
+## Prerequisites
  - 64-bit *nix, 800 Gb of free disk space, several gigs of RAM
  - Python, NumPy, octave, scikits-learn, PyYAML, oct2py, octave
  - Hollywood-2 dataset. To download and unpack it automatically, run:
@@ -11,12 +10,12 @@ measurement.
  
    > $ make get_vlfeat
 
-# Instructions
+## Instructions
 
-Make sure all prerequisites are in place. Study the Makefile (paths for fastvideofeat/fastfv and libs they need are set in the beginning), and then run the repro with:
+Make sure all prerequisites are in place. Adjust the paths to the tools in Makefile, and then run the repro with:
 > $ make --jobs 8
 
-You can adjust the number of cores used for parallel execution. In about two hours the scripts will fill the data and logs directories. After execution you will see a report like:
+You can adjust the number of cores used for parallel execution. In about an hour the scripts will fill the data and logs directories. After execution you will see a report like:
 ````
 Report on Hollywood-2 classification task
 
