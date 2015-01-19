@@ -1,4 +1,4 @@
-Reproducing Hollywood-2 results
+# Reproducing Hollywood-2 results
 
 ## Prerequisites
  - 64-bit *nix, 800 Gb of free disk space, several gigs of RAM
