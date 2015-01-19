@@ -31,45 +31,43 @@ We release two tools in this repository. The first tool **fastvideofeat** is a m
 The tool accepts a video file path as input and writes descriptors to standard output.  
 ##### Command-line options:
 
-Option | Default | Description
---- | --- | ---
--i video.avi | | specifies the path to the input video
---hog yes/no | **yes** | enables/disables HOG descriptor computation
---hof yes/no | **yes** | enables/disables HOF descriptor computation
---mbh yes/no | **yes** | enables/disables MBH descriptor computation
--f 1-10 | whole video | restricts descriptor computation to the given frame range
+Option | Description
+--- | ---
+--disableHOG | disables HOG descriptor computation
+--disableHOF | disables HOF descriptor computation
+--disableMBH | disables MBH descriptor computation
+-f 1-10 | restricts descriptor computation to the given frame range
 
 **IMPORTANT** Frame range is specified in terms of PTS (presentation time stamp) which are usually equivalent to frame indices, but not always. Beware. You can inspect PTS values of the frames of the video using ffmpeg's ffprobe (fourth column):
 
 > $ ffprobe -print_format csv -show_packets -select_streams 0 video.mp4
 
 The output format:
-   The first two lines of the standard output are comments explaining the format):
->  #descr = hog(96) hof(108) mbh(96 + 96)  
-   #x y pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight descr
+   The descriptor format is reminded on standard error:
+>    
+   #Descriptor format: xnorm ynorm tnorm pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight hog (dim. 96) hof (dim. 108) mbhx (dim. 96) mbhy(dim. 96)
 
 
-  + **x** and **y** are the normalized frame coordinates of the spatio-temporal (s-t) patch  
-  + **pts** is the frame number of the s-t patch center  
+  + **xnorm** and **ynorm** are the normalized frame coordinates of the spatio-temporal (s-t) patch  
+  + **tnorm** and **pts** are the normalized and unnormalized frame number of the s-t patch center  
   + **StartPTS** and **EndPTS** are the frame numbers of the first and last frames of the s-t patch  
   + **Xoffset** and **Yoffset** are the non-normalized frame coordinates of the s-t patch  
   + **PatchWidth** and **PatchHeight** are the non-normalized width and height of teh s-t patch
   + **descr** is the array of floats of concatenated descriptors. The size of this array depends on the enabled   descriptor types. All values are from zero to one. The first comment line describes the enabled descriptor types, their order in the array, and the dimension of each descriptor in the array.  
      
-After the comments every line corresponds to an extracted descriptor of a patch. All numbers in the output are floating point in text format and are separated by tabs.  
-The standard error contains various debug / diagnostic messages like time measurements and parameters in effect.
+Every line on standard output corresponds to an extracted descriptor of a patch anc consists of tab-separated floats.  
 
 ##### Examples:
   - Compute HOG, HOF, MBH and save the descriptors in descriptors.txt:
-    > $ ./fastvideofeat -i video.avi > descriptors.txt
+    > $ ./fastvideofeat video.avi > descriptors.txt
 
   - Compute only HOF and MBH from the first 600 frames and save the descriptors in descriptors.txt:
-    > $ ./fastvideofeat -i video.avi -hog no -hof yes -mbh yes -f 1-600 > descriptors.txt
+    > $ ./fastvideofeat video.avi --disableHOG -f 1-600 > descriptors.txt
 
 More examples in samples/compute_mpeg_features.sh.
 
 ### fastfv
-The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The code for saving to an HDF5 file is commented out, try to hack it if you need it.
+The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by yael.
 
 **IMPORTANT** The computed Fisher vectors are non-normalized. Please apply signed square rooting / power normalization, L2-normalization, clipping etc before training a classifier.
 ##### Command-line options:
@@ -82,19 +80,16 @@ Option | Default | Description
 --ytot 1.0 | 1.0 | specifies the frame height. If the **y** coordinate is non-normalized, this option is mandatory
 --tnpos 2 | | specifies the column with **t** coordinate of the s-t patch in the descriptor array
 --ttot 192 | 1.0 | specifies the number of frames in the video (actually the last PTS of the video, usually the two are equivalent, but not always). If the **t** coordinate is non-normalized, this option is mandatory
---gmm_k 256 | 256 | specifies the number of GMM components used for FV computation
---knn 5 | 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
---vocab 9-104 hog_K256.vocab | | specifies descriptor type location and path to GMM vocabs. This option is mandatory, and several options of this kind are allowed.
+--gmm_ncomponents 256 | 256 | specifies the number of GMM components used for FV computation
+--updatesperdescriptor 5 | 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
+--enablesecondorder | | Enables second-order part of the Fisher vector
+--vocab 9-104 hog_K256.gmm | | specifies descriptor type location and path to GMM vocab. This option is mandatory, and several options of this kind are allowed.
 --grid 1x3x2x | | specifies the layout of the s-t grid (**x** cells times **y** cells times **t** cells). This option is mandatory, and several options of this kind are allowed.
---buildGmmIndex | | this option will have the GMM vocabs computed and saved to the specified path. No Fisher vector will be computed
 
 
 ##### Examples:
-  - Build GMM vocabulary:
-    > $ cat descriptors.txt | $EXE_FV --buildGmmIndex --vocab 105-212 hof_K256.vocab
-
   - Compute Fisher vector:
-    > $ zcat sample_features_mpeg4.txt.gz | $EXE_FV --vocab 9-104 hollywood2_sample_vocabs/hog_K256.vocab --vocab 105-212 hollywood2_sample_vocabs/hof_K256.vocab --vocab 213-308 hollywood2_sample_vocabs/mbhx_K256.vocab --vocab 309-404 hollywood2_sample_vocabs/mbhy_K256.vocab --xnpos 0 --ynpos 1 --tnpos 2 --grid 1x1x1x --grid 2x2x1x --grid 1x3x1x --grid 1x1x2x --grid 2x2x2x --grid 1x3x2x --ttot 192 > fv.txt
+    > $ zcat sample_features_mpeg4.txt.gz | ./fastfv --vocab 9-104 hollywood2_sample_vocabs/hog_K256.gmm --vocab 105-212 hollywood2_sample_vocabs/hof_K256.gmm --vocab 213-308 hollywood2_sample_vocabs/mbhx_K256.gmm --vocab 309-404 hollywood2_sample_vocabs/mbhy_K256.gmm --xnpos 0 --ynpos 1 --tnpos 2 --grid 1x1x1x --grid 2x2x1x --grid 1x3x1x --grid 1x1x2x --grid 2x2x2x --grid 1x3x2x --ttot 192 > fv.txt
 
 Examples are explained in samples/compute_fisher_vector.sh. 
 
@@ -102,10 +97,7 @@ Building from source
 ====================
 
 ### Linux
-Make sure you have the dependencies installed and visible to the CC compiler (normally gcc). The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01.  If the dependencies are installed to a custom path, you may want to adjust CPATH and LIBRARY_PATH environment variables. Then navigate to the correspoding directory in **src** and type:
-> $ make
-
-The binaries will be placed in the **build** sub-directory.
+Make sure you have the dependencies installed and visible to g++. You can build the tools by running *make*.
 
 Dependencies for **fastvideofeat**:
  - opencv (http://opencv.org)
@@ -113,13 +105,13 @@ Dependencies for **fastvideofeat**:
 
 Dependencies for **fastfv**:
  - opencv (http://opencv.org)
- - yael (http://gforge.inria.fr/projects/yael/) [needed for computing the GMM vocab]
+ - yael (http://gforge.inria.fr/projects/yael/) [needed for reading the GMM vocab from a file]
 
-A minimal script to install dependencies on Linux is found in the 3rdparty directory.
+The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. A minimal script to download and install these libraries is in the 3rdparty directory.
 
 ### Windows
-Only **fastvideofeat** should work on Windows. **fastfv** cannot work because yael does not support Windows, though I guess it can be hacked to do so.
+Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
 
-To build **fastvideofeat**, you have to define %OPENCV_DIR%, %FFMPEG_DIR% environment variables.  You will also need to have a modern Visual Studio (or Visual C++ Express ). Then navigate to the corresponding directory in **src** and open VS.vcxproj.
+To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run *nmake -f Makefile.nmake* from a Visual Studio Developer Command Prompt.
 
-The binaries will be placed in the **build** sub-directory.
+For both Linux and Windows, the binaries will appear in the **build** sub-directory.

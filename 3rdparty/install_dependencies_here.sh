@@ -1,5 +1,5 @@
 # This script will try to download and install from sources opencv 2.4.9 (with minimal set of modules), ffmpeg 2.4, yasm 1.3.0 (required by ffmpeg).
-# I cannot guarantee it will work on absolutely all systems, hopefully it still provides you the guidance.
+# I cannot guarantee it will work on absolutely all systems, hopefully it still provides you guidance.
 
 wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
 tar -xf yasm-1.3.0.tar.gz
@@ -26,9 +26,11 @@ cd ../..
 wget https://gforge.inria.fr/frs/download.php/file/33810/yael_v401.tar.gz
 tar -xf yael_v401.tar.gz
 cd yael_v401
-bash configure.sh
+bash configure.sh --enable-numpy
 make
 cp yael/*.so ../lib
 mkdir -p ../include/yael
 cp yael/*.h ../include/yael
+mkdir -p ../lib/python
+cp yael/*.py ../lib/python
 cd ..

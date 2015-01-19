@@ -1,15 +1,13 @@
+#include <fstream>
 #include <string>
 #include <cstdio>
 #include <algorithm>
 #include <opencv/cv.h>
 #include <opencv/cxcore.h>
 
-#include "motion_vector_file_utils.h"
-#include "../commons/log.h"
-#include "frame_reader.h"
-#include "histogram_buffer.h"
-#include "desc_info.h"
-#include "options.h"
+#include "../util.h"
+#include "video.h"
+#include "descriptors.h"
 #include "diag.h"
 
 #include <iterator>
@@ -17,6 +15,45 @@
 
 using namespace std;
 using namespace cv;
+
+struct Options
+{
+	string VideoPath;
+	bool HogEnabled, HofEnabled, MbhEnabled;
+	bool Dense;
+	bool Interpolation;
+
+	vector<int> GoodPts;
+
+	Options(int argc, char* argv[])
+	{
+		HogEnabled = HofEnabled = MbhEnabled = true;
+		Dense = false;
+		Interpolation = true;
+		for(int i = 1; i < argc; i++)
+		{
+			if(strcmp(argv[i], "--disableHOG") == 0)
+				HogEnabled = false;
+			else if(strcmp(argv[i], "--disableHOF") == 0)
+				HofEnabled = false;
+			else if(strcmp(argv[i], "--disableMBH") == 0)
+				MbhEnabled = false;
+			else if(strcmp(argv[i], "-f") == 0)
+			{
+				int b, e;
+				sscanf(argv[i+1], "%d-%d", &b, &e);
+				for(int j = b; j <= e; j++)
+					GoodPts.push_back(j);
+				i++;
+			}
+			else
+				VideoPath = string(argv[i]);
+		}
+	
+		if(!ifstream(VideoPath.c_str()).good())
+			throw runtime_error("Video doesn't exist or can't be opened: " + VideoPath);
+	}
+};
 
 int main(int argc, char* argv[])
 {
@@ -43,13 +80,19 @@ int main(int argc, char* argv[])
 	int cellSize = rdr.OriginalFrameSize.width / frameSizeAfterInterpolation.width;
 	double fscale = 1 / 8.0;
 
-	log("Frame count:\t%d", rdr.FrameCount);
-	log("Original frame size:\t%dx%d", rdr.OriginalFrameSize.width, rdr.OriginalFrameSize.height);
-	log("Downsampled:\t%dx%d", rdr.DownsampledFrameSize.width, rdr.DownsampledFrameSize.height);
-	log("After interpolation:\t%dx%d", frameSizeAfterInterpolation.width, frameSizeAfterInterpolation.height);
-	log("CellSize:\t%d", cellSize);
+	log("Input video: %s", opts.VideoPath.c_str());
+	log("Enabled descriptors: {HOG: %s, HOF: %s, MBH: %s}", opts.HogEnabled ? "yes" : "no", opts.HofEnabled ? "yes" : "no", opts.MbhEnabled ? "yes" : "no");
+	fprintf(stderr, "Frame restrictions: [");
+	for(int i = 0; i < opts.GoodPts.size(); i++)
+		fprintf(stderr, "%d, ", opts.GoodPts[i]);
+	log("]");
+	log("Frame count: %d", rdr.FrameCount);
+	log("Original frame size: %dx%d", rdr.OriginalFrameSize.width, rdr.OriginalFrameSize.height);
+	log("Downsampled: %dx%d", rdr.DownsampledFrameSize.width, rdr.DownsampledFrameSize.height);
+	log("After interpolation: %dx%d", frameSizeAfterInterpolation.width, frameSizeAfterInterpolation.height);
+	log("CellSize: %d", cellSize);
 
-	HofMbhBuffer buffer(hogInfo, hofInfo, mbhInfo, nt_cell, tStride, frameSizeAfterInterpolation, fscale, true);
+	HofMbhBuffer buffer(hogInfo, hofInfo, mbhInfo, nt_cell, tStride, frameSizeAfterInterpolation, fscale, rdr.FrameCount, true);
  	buffer.PrintFileHeader();
 
 	TIMERS.Everything.Start();
@@ -60,7 +103,7 @@ int main(int argc, char* argv[])
 		if(frame.PTS == -1)
 			break;
 
-		log("#read frame pts=%d, mvs=%s, type=%c", frame.PTS, frame.NoMotionVectors ? "no" : "yes", frame.PictType);
+		log("# read frame pts=%d, mvs=%s, type=%c", frame.PTS, frame.NoMotionVectors ? "no" : "yes", frame.PictType);
 
 		if(opts.GoodPts.empty() || count(opts.GoodPts.begin(), opts.GoodPts.end(), frame.PTS) == 1)
 		{
@@ -73,7 +116,8 @@ int main(int argc, char* argv[])
 			}
 
 			frame.Interpolate(frameSizeAfterInterpolation, fscale);
-			buffer.Update(frame);
+			//buffer.Update(frame, 1 / fscale * 1 / fscale);
+			buffer.Update(frame, 1);
 			TIMERS.DescriptorComputation.Stop();
 		
 			if(buffer.AreDescriptorsReady)

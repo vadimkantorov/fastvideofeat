@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <vector>
 
-#include "../commons/timing.h"
-#include "options.h"
+#include "../util.h"
+#include "common.h"
 
 using namespace std;
 
@@ -11,37 +11,27 @@ using namespace std;
 
 struct Diag
 {
-	Timer Vocab;
-	Timer Reading;
-	Timer Writing;
-	Timer FLANN;
-	Timer Assigning;
-	Timer Copying;
-	Timer Total;
-	Timer ComputeGamma;
-	Timer UpdateFv;
-	int OpCount;
-	int DescriptorCnt;
+	Timer Vocab, Reading, Writing, FLANN, Assigning, Copying, Total, ComputeGamma, UpdateFv;
+	int OpCount, DescriptorCnt;
 
 	void Print(vector<Part>& parts)
 	{
-		printf("#STAT Vocab reading and construction: %.2lf secs\n", Vocab.TotalInSeconds());
-		printf("#STAT Reading: %.2lf secs\n", Reading.TotalInSeconds());
-		printf("#STAT Writing: %.2lf secs\n", Writing.TotalInSeconds());
-		printf("#STAT Flann: %.2lf secs\n", FLANN.TotalInSeconds());
-		printf("#STAT Assigning: %.2lf secs\n", Assigning.TotalInSeconds());
-		printf("#STAT ComputeGamma: %.2lf secs\n", ComputeGamma.TotalInSeconds());
-		printf("#STAT UpdateFv: %.2lf secs\n", UpdateFv.TotalInSeconds());
+		log("Vocab reading and construction (sec): %.2lf", Vocab.TotalInSeconds());
+		log("Reading (sec): %.2lf", Reading.TotalInSeconds());
+		log("Writing (sec): %.2lf", Writing.TotalInSeconds());
+		log("Flann (sec): %.2lf", FLANN.TotalInSeconds());
+		log("Assigning (sec): %.2lf", Assigning.TotalInSeconds());
+		log("ComputeGamma (sec): %.2lf", ComputeGamma.TotalInSeconds());
+		log("UpdateFv (sec): %.2lf", UpdateFv.TotalInSeconds());
 
-		printf("#STAT Copying: %.2lf secs\n", Copying.TotalInSeconds());
-		printf("#STAT Total: %.2lf secs\n", Total.TotalInSeconds());
-		printf("#STAT Ops: %d\n", OpCount);
-		printf("#STAT Descriptors: %d\n", DescriptorCnt);
-		printf("#STAT Part sizes: ");
+		log("Copying (sec): %.2lf", Copying.TotalInSeconds());
+		log("Total (sec): %.2lf", Total.TotalInSeconds());
+		log("Ops: %d", OpCount);
+		log("Descriptors: %d", DescriptorCnt);
+		fprintf(stderr, "Part sizes: [");
 		for(int i = 0; i < parts.size(); i++)
-			printf("%d ", parts[i].Size());
-		printf("\n");
-
+			fprintf(stderr, "%d, ", parts[i].Size);
+		log("]");
 	}
 
 	Diag() : OpCount(0), DescriptorCnt(0) {}

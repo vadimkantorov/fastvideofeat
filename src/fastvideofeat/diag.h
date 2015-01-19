@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <ctime>
 
-#include "../commons/timing.h"
+#include "../util.h"
 
 #ifndef __DIAG_H__
 #define __DIAG_H__
@@ -33,33 +33,35 @@ struct Diag
 
 	void Print(int frameCount)
 	{
-		log("Reading (sec):\t%.2lf", Reading.TotalInSeconds());
-		log("Decoding (sec):\t%.2lf", ReadingAndDecoding.TotalInSeconds() - Reading.TotalInSeconds());
+		log("Reading (sec): %.2lf", Reading.TotalInSeconds());
+		log("Decoding (sec): %.2lf", ReadingAndDecoding.TotalInSeconds() - Reading.TotalInSeconds());
 
-		log("Interp (sec):\t%.2lf", InterpolationHOFMBH.TotalInSeconds() + InterpolationHOG.TotalInSeconds());
-		log("Interp.HOFMBH (sec):\t%.2lf", InterpolationHOFMBH.TotalInSeconds());
+		log("Interp (sec): {total: %.2lf, HOG: %.2lf, HOFMBH: %.2lf}",
+			InterpolationHOFMBH.TotalInSeconds() + InterpolationHOG.TotalInSeconds(),
+			InterpolationHOG.TotalInSeconds(),
+			InterpolationHOFMBH.TotalInSeconds());
 		
-		log("IntHist (sec):\t%.2lf", DescriptorComputation.TotalInSeconds());
-		log("IntHist.HOG (sec):\t%.2lf", HogComputation.TotalInSeconds());
-		log("IntHist.HOF (sec):\t%.2lf", HofComputation.TotalInSeconds());
-		log("IntHist.MBH (sec):\t%.2lf", MbhComputation.TotalInSeconds());
-		log("Interp.HOG (sec):\t%.2lf", InterpolationHOG.TotalInSeconds());
+		log("IntHist (sec): {total: %.2lf, HOG: %.2lf, HOF: %.2lf, MBH: %.2lf}", 
+			DescriptorComputation.TotalInSeconds(),
+			HogComputation.TotalInSeconds(),
+			HofComputation.TotalInSeconds(),
+			MbhComputation.TotalInSeconds());
 		
-		log("Desc (sec):\t%.2lf", DescriptorQuerying.TotalInSeconds());
-		log("Desc.HOG (sec):\t%.2lf", HogQuerying.TotalInSeconds());
-		log("Desc.HOF (sec):\t%.2lf", HofQuerying.TotalInSeconds());
-		log("Desc.MBH (sec):\t%.2lf", MbhQuerying.TotalInSeconds());
+		log("Desc (sec): {total: %.2lf, HOG: %.2lf, HOF: %.2lf, MBH: %.2lf}",
+			DescriptorQuerying.TotalInSeconds(),
+			HogQuerying.TotalInSeconds(),
+			HofQuerying.TotalInSeconds(),
+			MbhQuerying.TotalInSeconds());
 
-		log("Writing (sec):\t%.2lf", Writing.TotalInSeconds());
+		log("Writing (sec): %.2lf", Writing.TotalInSeconds());
 
 		double totalWithoutWriting = Everything.TotalInSeconds() - Writing.TotalInSeconds();
-		log("Total (sec):\t%.2lf", totalWithoutWriting);
-		log("Total (with writing, sec):\t%.2lf", Everything.TotalInSeconds());
+		log("Total (sec): %.2lf", totalWithoutWriting);
+		log("Total (with writing, sec): %.2lf", Everything.TotalInSeconds());
 
-		log("Fps:\t%.2lf", frameCount / totalWithoutWriting);
-		log("Calls.ComputeDescriptor:\t%d", CallsComputeDescriptor);
-		log("Frames:\t%d", frameCount);
-		log("Frames.Skipped:\t%d", SkippedFrames);
+		log("Fps: %.2lf", frameCount / totalWithoutWriting);
+		log("Calls.ComputeDescriptor: %d", CallsComputeDescriptor);
+		log("Frames.Skipped: %d", SkippedFrames);
 	}
 } TIMERS;
 

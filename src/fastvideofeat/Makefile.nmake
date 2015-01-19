@@ -1,0 +1,16 @@
+OPENCV_DIR = opencv/build
+FFMPEG_DIR = ffmpeg-2.4.5-win64-dev
+ARCH = x64
+VC_VERSION = vc11
+
+LIBINCLUDE = /I$(OPENCV_DIR)/include /I$(FFMPEG_DIR)/include /I.
+LIBPATH = /LIBPATH:$(OPENCV_DIR)/$(ARCH)/$(VC_VERSION)/staticlib /LIBPATH:$(FFMPEG_DIR)/lib
+LIBS = zlib.lib opencv_core249.lib opencv_imgproc249.lib avcodec.lib avformat.lib avutil.lib swscale.lib swresample.lib
+
+all: $(SOURCE_FILES)
+	if not exist build (mkdir build)
+	if not exist inttypes.h (if exist msinttypes.h (rename msinttypes.h inttypes.h))
+	cl /MT /EHsc $(LIBINCLUDE) main.cpp /link $(LIBS) $(LIBPATH) /OUT:build/fastvideofeat.exe
+
+clean:
+	rmdir build /s /q
