@@ -5,9 +5,11 @@ measurement.
  - 64-bit *nix, 800 Gb of free disk space, several gigs of RAM
  - Python, NumPy, octave, scikits-learn, PyYAML, oct2py, octave
  - Hollywood-2 dataset. To download and unpack it automatically, run:
-   $ make get_hwd2
+ 
+   > $ make get_hwd2
  - VLfeat 0.9.19. To download and unpack it automatically, run:
-   $ make get_vlfeat
+ 
+   > $ make get_vlfeat
 
 # Instructions
 
