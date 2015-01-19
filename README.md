@@ -16,7 +16,7 @@ If you use this code, please cite our work:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year = {2014}  
 }
 
-The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository, the binaries are published on the repository [releases page](http://github.com/vadimkantorov/cvpr2014/releases).
+The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository, the binaries are published on the repository [releases page](http://github.com/vadimkantorov/cvpr2014/releases), the Hollywood-2 repro scripts are in the [repro directory] (http://github.com/vadimkantorov/cvpr2014/tree/master/repro/).
 
 Please submit bugs on [GitHub](http://github.com/vadimkantorov/cvpr2014/issues) directly.
 
@@ -46,11 +46,8 @@ Option | Description
 
 > $ ffprobe -print_format csv -show_packets -select_streams 0 video.mp4
 
-The output format:
-   The descriptor format is reminded on standard error:
->    
-   #Descriptor format: xnorm ynorm tnorm pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight hog (dim. 96) hof (dim. 108) mbhx (dim. 96) mbhy(dim. 96)
-
+The output format (also reminded on standard error):
+   ```#Descriptor format: xnorm ynorm tnorm pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight hog (dim. 96) hof (dim. 108) mbhx (dim. 96) mbhy(dim. 96)```
 
   + **xnorm** and **ynorm** are the normalized frame coordinates of the spatio-temporal (s-t) patch  
   + **tnorm** and **pts** are the normalized and unnormalized frame number of the s-t patch center  
