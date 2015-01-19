@@ -116,6 +116,6 @@ The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. A minimal sc
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
 
 To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run from a Visual Studio Developer Command Prompt:
- > nmake -f Makefile.nmake
+ > $ nmake -f Makefile.nmake
 
 For both Linux and Windows, the binaries will appear in the **build** sub-directory.
