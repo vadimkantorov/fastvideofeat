@@ -1,6 +1,6 @@
 # modify FASTVIDEOFEAT and LD_LIBRARY_PATH if you want to you use your own binaries / libs
-FASTVIDEOFEAT=../bin/ubuntu-x64/fastvideofeat
-LD_LIBRARY_PATH=../bin/ubuntu-x64:$LD_LIBRARY_PATH
+FASTVIDEOFEAT='Not executing. Put a path to fastvideofeat and to dependency libraries' && echo $FASTVIDEOFEAT && exit 1
+export LD_LIBRARY_PATH=PLACEHOLDER_FOR_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 # compute HOG/HOF/MBH features from MPEG4-encoded video. features_mpeg4.txt should approx. match uncompressed sample_features_mpeg4.txt.gz modulo minor ffmpeg decoding changes.
 $FASTVIDEOFEAT hollywood2_actioncliptrain00001_mpeg4.avi > features_mpeg4.txt
