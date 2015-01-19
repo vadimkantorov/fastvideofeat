@@ -47,6 +47,7 @@ Option | Description
 > $ ffprobe -print_format csv -show_packets -select_streams 0 video.mp4
 
 The output format (also reminded on standard error):
+
    ```#Descriptor format: xnorm ynorm tnorm pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight hog (dim. 96) hof (dim. 108) mbhx (dim. 96) mbhy(dim. 96)```
 
   + **xnorm** and **ynorm** are the normalized frame coordinates of the spatio-temporal (s-t) patch  
