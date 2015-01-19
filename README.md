@@ -28,6 +28,8 @@ Description and usage
 
 We release two tools in this repository. The first tool **fastvideofeat** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fastfv** that uses vector SSE2 CPU instructions.
 
+We also release scripts (in the repro directory) for reproducing our results on Hollywood-2 datast.
+
 ### fastvideofeat
 
 The tool accepts a video file path as input and writes descriptors to standard output.  
