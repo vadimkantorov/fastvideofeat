@@ -1,8 +1,8 @@
 #### Tools paths
 
-FASTVIDEOFEAT = $(error Update Makefile with correct tools paths)
-FASTFV = $(error Update Makefile with correct tools paths)
-LIBS = $(error Update Makefile with correct libs path, or empty path if libs are already discoverable)
+FASTVIDEOFEAT := $(error Update Makefile with correct tools paths)
+FASTFV := $(error Update Makefile with correct tools paths)
+LIBS := $(error Update Makefile with correct libs path, or empty path if libs are already discoverable)
 
 #### Parameter settings ####
 
