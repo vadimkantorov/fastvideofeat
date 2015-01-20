@@ -3,10 +3,10 @@ FASTVIDEOFEAT='Not executing. Put a path to fastfv and to dependency libraries' 
 export LD_LIBRARY_PATH=PLACEHOLDER_FOR_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 # Compute GMM vocabs for HOG / HOF / MBH. Lines below commented because we don't provide a feature archive.
-# cat features*.gz | ./gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
-# cat features*.gz | ./gmm_train.py --gmm_ncomponents 256 --vocab 106-213 106-213.hog.gmm
-# cat features*.gz | ./gmm_train.py --gmm_ncomponents 256 --vocab 214-309 214-309.mbhx.gmm
-# cat features*.gz | ./gmm_train.py --gmm_ncomponents 256 --vocab 310-405 310-405.mbhy.gmm
+# cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
+# cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 106-213 106-213.hog.gmm
+# cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 214-309 214-309.mbhx.gmm
+# cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 310-405 310-405.mbhy.gmm
 
 # compute unnormalized Fisher vectors for MPEG features using precomputed vocabs
 # The descriptor part indices are zero-based and inclusive:
