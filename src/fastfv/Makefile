@@ -1,10 +1,11 @@
-CFLAGS = -O3 -rdynamic -msse3 -std=c++0x
-LDFLAGS = -lopencv_core -lopencv_flann -lyael 
-INSTALLED_DEPS = -I../../3rdparty/include -L../../3rdparty/lib 
+# Will link statically with OpenCV, Yael, OpenMP, OpenBLAS, gfortran. To link dynamically, remove "-Wl,-Bstatic" and "-Wl,-Bdynamic"
+
+CFLAGS = -O3 -msse3 -std=c++0x
+LDFLAGS = -lopencv_flann -lopencv_core -Wl,-Bstatic -lyael -lgomp -lopenblas -lgfortran -Wl,-Bdynamic -lpthread -lz -lm -lc -lrt
+INSTALLED_DEPS = -I../../bin/3rdparty/include -L../../bin/3rdparty/lib 
+BIN = ../../bin/fastfv
 
 all: $(SOURCE_FILES)
-	mkdir -p build
-	g++ main.cpp -o build/fastfv $(CFLAGS) $(LDFLAGS) $(INSTALLED_DEPS)
-
+	g++ main.cpp -o $(BIN) $(CFLAGS) $(LDFLAGS) $(INSTALLED_DEPS)
 clean:
-	rm -rf build
+	rm $(BIN)

@@ -1,16 +1,21 @@
 #### Tools paths
 
-FASTVIDEOFEAT := $(error Update Makefile with correct tools paths)
-FASTFV := $(error Update Makefile with correct tools paths)
-LIBS := $(error Update Makefile with correct libs path, or empty path if libs are already discoverable)
+#FASTVIDEOFEAT := $(error Update Makefile with correct tools paths)
+#FASTFV := $(error Update Makefile with correct tools paths)
+#LIBS := $(error Update Makefile with correct libs path, or empty path if libs are already discoverable)
 
+FASTVIDEOFEAT := ../../bin/linux-x64/fastvideofeat
+FASTFV := ../../bin/linux-x64/fastfv
+LIBS := $(dir $(FASTFV))
 #### Parameter settings ####
 
 FV_GMM_NCOMPONENTS = 256
 FASTFV_FLANN_NTREES = 4
 FASTFV_FLANN_NCOMPARISONS = 32
 FASTFV_UPDATESPERDESCRIPTOR = 5
-FASTFV_GRIDS = 1x1x1x 1x3x1x 1x1x2x 2x2x1x 2x2x2x 1x3x2x
+#FASTFV_GRIDS = 1x1x1 1x3x1 1x1x2 2x2x1 2x2x2 1x3x2
+#FASTFV_GRIDS = 1x1x1 1x3x1 1x1x2
+FASTFV_GRIDS = 1x1x1
 
 #####
 
@@ -52,8 +57,9 @@ $(vocabs): $(features_sampled)
 #	@cut -d'	' -f $(shell echo $@ | grep -o '[0-9]\+-[0-9]\+') $(features_sampled) | ./pca_test.py $@.pca.npz 0.5 | python gmm_train.py 256 > $@
 
 $(fisher_vectors): $(features) $(vocabs)
-	#cat $(subst fisher_vectors,features, $@) | $(FASTFV) $(foreach g, $(vocabs), --vocab $(call cut, $(g)) $(g)) --xnpos 0 --ynpos 1 --tnpos 2 --grid 1x1x1x --grid 1x3x1x --grid 1x1x2x --flann_ntrees $(FASTFV_FLANN_NTREES) --flann_ncomparisons $(FASTFV_FLANN_NCOMPARISONS) --updatesperdescriptor $(FASTFV_UPDATESPERDESCRIPTOR) > $@ 2> $(log)
-	cat $(subst fisher_vectors,features, $@) | ./yaelfv_grids_1x1x1_1x3x1_1x1x2.py $(foreach g, $(vocabs), --vocab $(call cut, $(g)) $(g)) --xnpos 0 --ynpos 1 --tnpos 2 > $@ 2> $(log)
+	#cat $(subst fisher_vectors,features, $@) | $(FASTFV) $(foreach g, $(vocabs), --vocab $(call cut, $(g)) $(g)) --xnpos 0 --ynpos 1 --tnpos 2 $(foreach g, $(FASTFV_GRIDS), --grid $(g)) --flann_ntrees $(FASTFV_FLANN_NTREES) --flann_ncomparisons $(FASTFV_FLANN_NCOMPARISONS) --updatesperdescriptor $(FASTFV_UPDATESPERDESCRIPTOR) > $@ 2> $(log)
+	echo $(PYTHONPATH)
+	cat $(subst fisher_vectors,features, $@) | ./yaelfv_grids_1x1x1.py $(foreach g, $(vocabs), --vocab $(call cut, $(g)) $(g)) --xnpos 0 --ynpos 1 --tnpos 2 > $@ 2> $(log)
 
 $(kernel) : $(fisher_vectors)
 	@./dot_kernel.py $(fisher_vectors) > $@

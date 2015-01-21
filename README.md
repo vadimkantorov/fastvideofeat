@@ -1,5 +1,4 @@
-Information & Contact
-=====================
+# Information & Contact
 
 This code was used to compute the results of the following paper:
   
@@ -23,8 +22,7 @@ Please submit bugs on [GitHub](http://github.com/vadimkantorov/cvpr2014/issues) 
 For any other question, please contact Vadim Kantorov at vadim.kantorov@inria.fr or vadim.kantorov@gmail.com.
 
 
-Description and usage
-=====================
+# Description and usage
 
 We release two tools in this repository. The first tool **fastvideofeat** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fastfv** that uses vector SSE2 CPU instructions.
 
@@ -96,8 +94,9 @@ Option | Default | Description
 
 Examples are explained in samples/compute_fisher_vector.sh. 
 
-Building from source
-====================
+# Building from source
+
+On both Linux and Windows, the binaries will appear in **bin** after building. By default, code links statically with dependencies below, check Makefiles for details.
 
 ### Linux
 Make sure you have the dependencies installed and visible to g++. You can build the tools by running *make*.
@@ -109,8 +108,9 @@ Dependencies for **fastvideofeat**:
 Dependencies for **fastfv**:
  - opencv (http://opencv.org)
  - yael (http://gforge.inria.fr/projects/yael/) [needed for reading the GMM vocab from a file]
+ - openblas (http://openblas.net) [needed by yael]
 
-The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. A minimal script to download and install these libraries is in the *3rdparty* directory.
+The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01, OpenBLAS 2.0.13. A minimal script to download and install these libraries is in the *bin* directory.
 
 ### Windows
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
@@ -118,4 +118,6 @@ Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build bec
 To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run from a Visual Studio Developer Command Prompt:
  > $ nmake -f Makefile.nmake
 
-For both Linux and Windows, the binaries will appear in the **build** sub-directory.
+# Notes
+
+For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on that part is huge.

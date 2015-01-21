@@ -79,12 +79,14 @@ for x, y, t in mesh:
 
 res = np.zeros((nx + ny + nt, acc.shape[-1]), dtype = np.float32)
 fvAccRenorm = lambda inds: reduce(np.add, [acc[xyt] for xyt in inds])# / np.sqrt(np.sum([ndescr[xyt] for xyt in inds]))
+tic = time.clock()
 res[0] = fvAccRenorm(mesh)
 res[1] = fvAccRenorm([(0, 0, 0), (0, 0, 1)])
 res[2] = fvAccRenorm([(0, 1, 0), (0, 1, 1)])
 res[3] = fvAccRenorm([(0, 2, 0), (0, 2, 1)])
 res[4] = fvAccRenorm([(0, 0, 0), (0, 1, 0), (0, 2, 0)])
 res[5] = fvAccRenorm([(0, 0, 1), (0, 1, 1), (0, 2, 1)])
+timerAssigning += time.clock() - tic
 
 begin, end = 0, 0
 for cutFrom, cutTo, fvSize, gmm, partName in parts:
