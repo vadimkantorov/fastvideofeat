@@ -66,7 +66,7 @@ Every line on standard output corresponds to an extracted descriptor of a patch 
   - Compute only HOF and MBH from the first 600 frames and save the descriptors in descriptors.txt:
     > $ ./fastvideofeat video.avi --disableHOG -f 1-600 > descriptors.txt
 
-More examples in samples/compute_mpeg_features.sh.
+More examples in *samples/compute_mpeg_features.sh*.
 
 ### fastfv
 The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by Yael library. A [sample script](https://github.com/vadimkantorov/cvpr2014/blob/master/src/gmm_train.py) to build GMM vocabs with Yael is provided, as well as its [usage example](https://github.com/vadimkantorov/cvpr2014/blob/master/samples/compute_fisher_vectors.sh).
