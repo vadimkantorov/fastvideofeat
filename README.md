@@ -71,7 +71,7 @@ More examples in samples/compute_mpeg_features.sh.
 ### fastfv
 The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by Yael library. A [sample script](https://github.com/vadimkantorov/cvpr2014/blob/master/src/gmm_train.py) to build GMM vocabs with Yael is provided, as well as its [usage example](https://github.com/vadimkantorov/cvpr2014/blob/master/samples/compute_fisher_vectors.sh).
 
-**IMPORTANT** The computed Fisher vectors are non-normalized. Please apply signed square rooting / power normalization, L2-normalization, clipping etc before training a classifier.
+**IMPORTANT** The computed Fisher vectors are non-normalized, apply signed square rooting / power normalization, L2-normalization, clipping etc before training a classifier.
 ##### Command-line options:
 
 Option | Default | Description
