@@ -1,6 +1,6 @@
 # Information & Contact
 
-This code was used to compute the results of the following paper:
+An earlier version of this code was used to compute the results of the following paper:
   
 >"Efficient feature extraction, encoding and classification for action recognition",  
 Vadim Kantorov, Ivan Laptev,  
@@ -27,6 +27,8 @@ For any other question, please contact Vadim Kantorov at vadim.kantorov@inria.fr
 We release two tools in this repository. The first tool **fastvideofeat** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fastfv** that uses vector SSE2 CPU instructions.
 
 We also release scripts (in the *repro* directory) for reproducing our results on Hollywood-2 dataset.
+
+All code is released under MIT license.
 
 ### fastvideofeat
 
@@ -120,4 +122,7 @@ To build **fastvideofeat**, set in Makefile the good paths to the dependencies, 
 
 # Notes
 
-For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on that part is huge.
+For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on text file reading/writing is huge.
+
+# License
+MIT
