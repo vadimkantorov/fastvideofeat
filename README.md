@@ -100,19 +100,18 @@ Examples are explained in *samples/compute_fisher_vector.sh*.
 
 On both Linux and Windows, the binaries will appear in *bin* after building. By default, code links statically with dependencies below, check Makefiles for details.
 
-### Linux
-Make sure you have the dependencies installed and visible to g++. You can build the tools by running *make*.
-
 Dependencies for **fastvideofeat**:
  - opencv (http://opencv.org)
  - ffmpeg (http://ffmpeg.org)
 
 Dependencies for **fastfv**:
  - opencv (http://opencv.org)
- - yael (http://gforge.inria.fr/projects/yael/) [needed for reading the GMM vocab from a file]
- - openblas (http://openblas.net) [needed by yael]
+ - yael (http://gforge.inria.fr/projects/yael/)
 
-The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01, OpenBLAS 2.0.13. A minimal script to download and install these libraries is in the *bin* directory.
+The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. 
+
+### Linux
+Make sure you have the dependencies installed and visible to g++ (a minimal installation script is in the *bin* directory). Build the tools by running *make*.
 
 ### Windows
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
