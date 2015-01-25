@@ -111,7 +111,7 @@ Dependencies for **fastfv**:
 The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. 
 
 ### Linux
-Make sure you have the dependencies installed and visible to g++ (a minimal installation script is in the *bin* directory). Build the tools by running *make*.
+Make sure you have the dependencies installed and visible to g++ (a minimal installation script is in the *bin* directory). Build the tools by running **make**.
 
 ### Windows
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
