@@ -74,16 +74,16 @@ The tool accepts descriptors on the standard input and writes Fisher vector (FV)
 **IMPORTANT** The computed Fisher vectors are non-normalized, apply signed square rooting / power normalization, L2-normalization, clipping etc before training a classifier.
 ##### Command-line options:
 
-Option | Default | Description
---- | --- | ---
---xpos 0 | | specifies the column with **x** coordinate of the s-t patch in the descriptor array
---ypos 1 | | specifies the column with **y** coordinate of the s-t patch in the descriptor array
---tpos 2 | | specifies the column with **t** coordinate of the s-t patch in the descriptor array
---knn 5 | 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
---vocab 9-104 hog_K256.gmm | | specifies descriptor type location and path to GMM vocab. This option is mandatory, and several options of this kind are allowed.
---enableflann 4 32 | knn is used instead of flann | use FLANN for descriptor attribution, first argument is number of kd-trees, second argument is number of checks performed during attribution
---enablespatiotemporalgrids | | enables spatio-temporal grids: 1x1x1, 1x3x1, 1x1x2
---enablesecondorder | | enables second-order part of the Fisher vector
+Option | Description
+--- | ---
+--xpos 0 | specifies the column with **x** coordinate of the s-t patch in the descriptor array
+--ypos 1 | specifies the column with **y** coordinate of the s-t patch in the descriptor array
+--tpos 2 | specifies the column with **t** coordinate of the s-t patch in the descriptor array
+--knn 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
+--vocab 10-105 10-105.hog.gmm | specifies descriptor type location and path to GMM vocab. This option is mandatory, and several options of this kind are allowed.
+--enableflann 4 32 | use FLANN instead of knn for descriptor attribution, first argument is number of kd-trees, second argument is number of checks performed during attribution
+--enablespatiotemporalgrids | enables spatio-temporal grids: 1x1x1, 1x3x1, 1x1x2
+--enablesecondorder | enables second-order part of the Fisher vector
 
 ##### Examples:
   - Compute Fisher vector:
