@@ -1,9 +1,7 @@
-# This script will try to download and install from sources opencv 2.4.9 (with minimal set of modules), ffmpeg 2.4, yasm 1.3.0 (required by ffmpeg), yael 4.01 and OpenBlas 0.2.13 (required by yael).
-# I cannot guarantee it will work on absolutely all systems, hopefully it still provides you guidance.
+# This script will try to download and install from sources opencv 2.4.9 (with minimal set of modules), ffmpeg 2.4, yasm 1.3.0 (required by ffmpeg), yael 4.38, ATLAS 3.10.2 and LAPACK 3.5.0 (required by yael).
+# I cannot guarantee it will work on absolutely all systems, hopefully it still provides guidance.
 
-mkdir -p 3rdparty
-cd 3rdparty
-
+mkdir -p dependencies && cd dependencies
 
 wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
 tar -xf yasm-1.3.0.tar.gz
@@ -23,26 +21,23 @@ wget http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/2.4.9/op
 unzip opencv-2.4.9.zip
 cd opencv-2.4.9
 mkdir build && cd build
-cmake -D CMAKE_INSTALL_PREFIX=$(pwd)/../.. -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_SHARED_LIBS=OFF -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_EXAMPLES=OFF -D BUILD_opencv_gpu=OFF -D BUILD_opencv_python=OFF -D BUILD_opencv_java=OFF -D BUILD_opencv_ml=OFF -D BUILD_opencv_contrib=OFF -D BUILD_opencv_ocl=OFF -D BUILD_opencv_legacy=oFF -D BUILD_opencv_nonfree=OFF -D BUILD_opencv_photo=OFF -D BUILD_opencv_video=OFF -D BUILD_opencv_stitching=OFF -D BUILD_opencv_superres=OFF -D BUILD_opencv_photo=OFF -D BUILD_opencv_objdetect=OFF -D BUILD_opencv_features2d=OFF -D BUILD_opencv_calib3d=OFF -D WITH_CUDA=OFF ..
+cmake -D CMAKE_INSTALL_PREFIX=$(pwd)/../.. -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_SHARED_LIBS=OFF -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_EXAMPLES=OFF -D BUILD_opencv_gpu=OFF -D BUILD_opencv_python=OFF -D BUILD_opencv_java=OFF -D BUILD_opencv_ml=OFF -D BUILD_opencv_contrib=OFF -D BUILD_opencv_ocl=OFF -D BUILD_opencv_legacy=OFF -D BUILD_opencv_nonfree=OFF -D BUILD_opencv_photo=OFF -D BUILD_opencv_video=OFF -D BUILD_opencv_stitching=OFF -D BUILD_opencv_superres=OFF -D BUILD_opencv_photo=OFF -D BUILD_opencv_objdetect=OFF -D BUILD_opencv_features2d=OFF -D BUILD_opencv_calib3d=OFF -D WITH_CUDA=OFF ..
 make -j4 && make install
 cd ../..
 
-wget http://github.com/xianyi/OpenBLAS/tarball/v0.2.13
-tar -xf v0.2.13
-cd xianyi-OpenBLAS-aceee4e
-make -j4 FC=gfortran && make PREFIX=$(pwd)/.. install
-cd ..
+wget http://www.netlib.org/lapack/lapack-3.5.0.tgz
+wget http://downloads.sourceforge.net/project/math-atlas/Stable/3.10.2/atlas3.10.2.tar.bz2
+tar -xf atlas3.10.2.tar.bz2
+cd ATLAS
+mkdir build && cd build
+../configure -t 0 --prefix=$(pwd)/../.. --with-netlib-lapack-tarfile=../../lapack-3.5.0.tgz
+make -j4 && make install
+cd ../..
 
-wget https://gforge.inria.fr/frs/download.php/file/33810/yael_v401.tar.gz
-tar -xf yael_v401.tar.gz
-cd yael_v401
+wget https://gforge.inria.fr/frs/download.php/file/33810/yael_v438.tar.gz
+mkdir yael && tar -xf yael_v438.tar.gz -C yael --strip-components=1
+cd yael
+export LDFLAGS='-L../lib -lf77blas -llapack'
 bash configure.sh --enable-numpy
-make
-cp yael/*.so yael/*.a ../lib
-mkdir -p ../include/yael
-cp yael/*.h ../include/yael
-mkdir -p ../lib/python
-cp yael/*.py ../lib/python
-cd ..
-
+make -j4
 cd ..

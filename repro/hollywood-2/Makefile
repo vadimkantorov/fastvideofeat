@@ -1,44 +1,40 @@
-#### Tools paths
-
-#FASTVIDEOFEAT := $(error Update Makefile with correct tools paths)
-#FASTFV := $(error Update Makefile with correct tools paths)
-#LIBS := $(error Update Makefile with correct libs path, or empty path if libs are already discoverable)
-
-FASTVIDEOFEAT := ../../bin/linux-x64/fastvideofeat
-FASTFV := ../../bin/linux-x64/fastfv
-LIBS := $(dir $(FASTFV))
-#### Parameter settings ####
-
+# Parameter settings
 FV_GMM_NCOMPONENTS = 256
+FASTFV_KNN = 5
 FASTFV_FLANN_NTREES = 4
 FASTFV_FLANN_NCOMPARISONS = 32
-FASTFV_UPDATESPERDESCRIPTOR = 5
-#FASTFV_GRIDS = 1x1x1 1x3x1 1x1x2 2x2x1 2x2x2 1x3x2
-#FASTFV_GRIDS = 1x1x1 1x3x1 1x1x2
-FASTFV_GRIDS = 1x1x1
+# comment next line to disable flann
+FASTFV_QUANTIZER = --enableflann $(FASTFV_FLANN_NTREES) $(FASTFV_FLANN_NCOMPARISONS)
+# comment next line to disable s-t grids
+FV_SPATIO_TEMPORAL_GRIDS = --enablespatiotemporalgrids
+# comment next line and uncomment the one after to use yael
+FV = $(FASTFV)
+#FV = ./yaelfv.py
 
-#####
+# Tools paths
+FASTVIDEOFEAT = ../../bin/fastvideofeat
+FASTFV = ../../bin/fastfv
+YAELDIR = ../../bin/dependencies/yael
+export PYTHONPATH := $(YAELDIR):$(PYTHONPATH)
 
-export LD_LIBRARY_PATH := $(LIBS):$(LD_LIBRARY_PATH)
-export PYTHONPATH := $(LIBS):$(PYTHONPATH)
+# repro below
+trainClips = $(shell seq 823 | xargs printf "actioncliptrain%05d.avi ")
+testClips = $(shell seq 884 | xargs printf "actioncliptest%05d.avi ")
+allClips = $(trainClips) $(testClips)
 
-trainClips := $(shell seq 823 | xargs printf "actioncliptrain%05d.avi ")
-testClips := $(shell seq 884 | xargs printf "actioncliptest%05d.avi ")
-allClips := $(trainClips) $(testClips)
-
-videoDir := data/dataset/Hollywood2/AVIClips
-evalDir := data/dataset/Hollywood2/ClipSets
-dataset := $(addprefix $(videoDir)/, $(allClips))
-features := $(addprefix data/features/, $(addsuffix .txt, $(allClips)))
-features_sampled := data/features_sampled.txt
-vocabs := $(addprefix data/vocabs/, 10-105.hog.gmm 106-213.hog.gmm 214-309.mbhx.gmm 310-405.mbhy.gmm)
-fisher_vectors := $(addprefix data/fisher_vectors/, $(addsuffix .txt, $(allClips)))
-kernel := data/kernel.txt
-vlfeat := vlfeat-0.9.19/toolbox/plotop/vl_pr.m
-classification := data/classification.txt
+videoDir = data/dataset/Hollywood2/AVIClips
+evalDir = data/dataset/Hollywood2/ClipSets
+dataset = $(addprefix $(videoDir)/, $(allClips))
+features = $(addprefix data/features/, $(addsuffix .txt, $(allClips)))
+features_sampled = data/features_sampled.txt
+vocabs = $(addprefix data/vocabs/, 10-105.hog.gmm 106-213.hog.gmm 214-309.mbhx.gmm 310-405.mbhy.gmm)
+fisher_vectors = $(addprefix data/fisher_vectors/, $(addsuffix .txt, $(allClips)))
+kernel = data/kernel.txt
+vlfeat = vlfeat-0.9.19/toolbox/plotop/vl_pr.m
+classification = data/classification.txt
 
 log = $(subst data, logs, $@).log
-cut = $(basename $(basename $(notdir $(1))))
+vocab = $(basename $(basename $(notdir $(1)))) $(1)
 
 all: $(classification)
 	./report.py
@@ -50,22 +46,16 @@ $(features_sampled): $(features)
 	awk '{ if (rand() <= .01) print }' data/features/actioncliptrain* > $@
 
 $(vocabs): $(features_sampled)
-	cat $(features_sampled) | ../../src/gmm_train.py --gmm_ncomponents $(FV_GMM_NCOMPONENTS) --vocab $(call cut, $@) $@ > $(log) 2>&1
-
-#$(vocabs): $(features_sampled)
-#	@cut -d'	' -f $(shell echo $@ | grep -o '[0-9]\+-[0-9]\+') $(features_sampled) | ./pca_train.py $@.pca.npz
-#	@cut -d'	' -f $(shell echo $@ | grep -o '[0-9]\+-[0-9]\+') $(features_sampled) | ./pca_test.py $@.pca.npz 0.5 | python gmm_train.py 256 > $@
+	cat $(features_sampled) | ../../src/gmm_train.py --gmm_ncomponents $(FV_GMM_NCOMPONENTS) --vocab $(call vocab, $@) > $(log) 2>&1
 
 $(fisher_vectors): $(features) $(vocabs)
-	#cat $(subst fisher_vectors,features, $@) | $(FASTFV) $(foreach g, $(vocabs), --vocab $(call cut, $(g)) $(g)) --xnpos 0 --ynpos 1 --tnpos 2 $(foreach g, $(FASTFV_GRIDS), --grid $(g)) --flann_ntrees $(FASTFV_FLANN_NTREES) --flann_ncomparisons $(FASTFV_FLANN_NCOMPARISONS) --updatesperdescriptor $(FASTFV_UPDATESPERDESCRIPTOR) > $@ 2> $(log)
-	echo $(PYTHONPATH)
-	cat $(subst fisher_vectors,features, $@) | ./yaelfv_grids_1x1x1.py $(foreach g, $(vocabs), --vocab $(call cut, $(g)) $(g)) --xnpos 0 --ynpos 1 --tnpos 2 > $@ 2> $(log)
+	cat $(subst fisher_vectors,features, $@) | $(FV) --xpos 0 --ypos 1 --tpos 2 --knn $(FASTFV_KNN) $(FASTFV_QUANTIZER) $(FV_SPATIO_TEMPORAL_GRIDS) $(foreach g, $(vocabs), --vocab $(call vocab, $(g))) > $@ 2> $(log)
 
 $(kernel) : $(fisher_vectors)
-	@./dot_kernel.py $(fisher_vectors) > $@
+	./dot_kernel.py $(fisher_vectors) > $@
 
 $(classification) : $(kernel) $(vlfeat)
-	@cat $(kernel) | ./classify.py $(evalDir) $(basename $(allClips)) > $@
+	cat $(kernel) | ./classify.py $(evalDir) $(basename $(allClips)) > $@
 
 .PHONY: all get_hwd2 get_vlfeat clean
 

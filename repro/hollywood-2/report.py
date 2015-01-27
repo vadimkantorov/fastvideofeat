@@ -26,7 +26,7 @@ print '  Average HOG fps: %.2f' % np.mean([y['Frame count'] / float(y['Decoding 
 print '  Average HOF fps: %.2f' % np.mean([y['Frame count'] / float(y['Decoding (sec)'] + y['Interp (sec)']['HOFMBH'] + y['IntHist (sec)']['HOF'] + y['Desc (sec)']['HOF']) for y in features])
 print '  Average MBH fps: %.2f' % np.mean([y['Frame count'] / float(y['Decoding (sec)'] + y['Interp (sec)']['HOFMBH'] + y['IntHist (sec)']['MBH'] + y['Desc (sec)']['MBH']) for y in features])
 print ''
-print 'Fisher vectors (components: %d, grids: %s, updates/descriptor: %s, second order enabled: %s, FLANN trees: %s, FLANN comparisons: %s):' % (fisher_vectors[0]['10-105']['k'], fisher_vectors[0]['Grids'], fisher_vectors[0].get('K_nn', 'N/A'), fisher_vectors[0]['Enable second order'], fisher_vectors[0].get('FLANN trees', 'N/A'), fisher_vectors[0].get('FLANN checks', 'N/A'))
+print 'Fisher vectors (components: %d, s-t grids enabled: %s, knn: %s, second order enabled: %s, FLANN trees: %s, FLANN comparisons: %s):' % (fisher_vectors[0]['10-105']['k'], fisher_vectors[0]['Enable spatio-temporal grids (1x1x1, 1x3x1, 1x1x2)'], fisher_vectors[0].get('K_nn', 'N/A'), fisher_vectors[0]['Enable second order'], fisher_vectors[0].get('FLANN trees', -1), fisher_vectors[0].get('FLANN checks', -1))
 print '  Average total fps: %.2lf' % np.mean([y['Frame count'] / float(z.get('Copying (sec)', 0) + z.get('Flann (sec)', 0) + z.get('Assigning (sec)', 0)) for y, z in zip(features, fisher_vectors)])
 print ''
 print 'Classification:'

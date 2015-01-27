@@ -18,11 +18,10 @@ using namespace cv;
 
 struct GmmVocab
 {
-	float lambda;
 	int k;
 	Mat_<float> mu, sigma, w;
 
-	GmmVocab(string vocabPath, float lambda) : lambda(lambda)
+	GmmVocab(string vocabPath)
 	{
 		FILE* f = fopen(vocabPath.c_str(), "r");
 		if(f == NULL)
@@ -38,86 +37,42 @@ struct GmmVocab
 		mu = Mat_<float>(k, d, g->mu, Mat::AUTO_STEP);
 		sigma = Mat_<float>(k, d, g->sigma, Mat::AUTO_STEP);	
 		
-		const float min_sigma = 1e-10;
+		float minLambda = 1e-4;
 		for(int i = 0; i < sigma.rows; i++)
 			for(int j = 0; j < sigma.cols; j++)
-				sigma(i, j) = sigma(i, j) + lambda;
+				sigma(i, j) = sigma(i, j) + minLambda;
 	}
 };
 
 struct SpmFisherVector
 {
-	static int LCM(int a_, int b_)
-	{
-		int a = a_, b = b_, c;
-		while((c = a % b) != 0)
-		{
-			a = b;
-			b = c;
-		}
-		int gcd = b;
-		return a / gcd * b;
-	}
-	
-	SpmFisherVector(vector<Grid> grids, GmmVocab& vocab, Part part, int k_nn, bool do_sigma)
-		: w(vocab.w), d(part.Size), k(vocab.k), k_nn(k_nn), grids(grids), do_sigma(do_sigma), descr_aligned(1, part.Size)
+	SpmFisherVector(bool enableGrids, GmmVocab& vocab, Part part, int k_nn, bool do_sigma)
+		: w(vocab.w), d(part.Size), k(vocab.k), k_nn(k_nn), part(part), do_sigma(do_sigma)
 	{
 		mu = vocab.mu;
 		sigma = vocab.sigma;
 
-		if(mu.cols % 4 != 0)
-			mu = mu(Range::all(), Range(0, mu.cols / 4 * 4)).clone();
-		if(sigma.cols % 4 != 0)
-			sigma = sigma(Range::all(), Range(0, sigma.cols / 4 * 4)).clone();
-		
+		assert((uintptr_t(mu.ptr<float>()) % 16) == 0 && mu.cols % 4 == 0);
+		assert((uintptr_t(sigma.ptr<float>()) % 16) == 0 && sigma.cols % 4 == 0);
 		assert(d % 4 == 0);
+		
+		grid = enableGrids ? Grid(1, 3, 2) : Grid(1, 1, 1);
 		int fvSize = (do_sigma ? 2 : 1) * (part.Size * vocab.k);
-		
-		char varName[200];
-		int totalCells = 0;
-		for(int i = 0; i < grids.size(); i++)
-		{
-			Grid& g = grids[i];
-			eff = Grid(LCM(eff.nx, g.nx), LCM(eff.ny, g.ny), LCM(eff.nt, g.nt));
-			
-			firstCell.push_back(totalCells);
-			totalCells += g.TotalCells;
-
-			for(int xInd = 0; xInd < g.nx; xInd++)
-			{
-				for(int yInd = 0; yInd < g.ny; yInd++)
-				{
-					for(int tInd = 0; tInd < g.nt; tInd++)
-					{
-						sprintf(varName, "#FV %s %s (%d-%d), %d-%d-%d", g.ToString, part.ToString.c_str(), part.FeatStart, part.FeatEnd, xInd, yInd, tInd);
-						ToString.push_back(string(varName));
-					}
-				}
-			}
-		}
-		
-		eff_FV = Mat_<float>::zeros(eff.TotalCells, fvSize);
-		FV = Mat_<float>::zeros(totalCells, fvSize);
+		eff_FV = Mat_<float>::zeros(grid.TotalCells, fvSize);
 		
 		ComputeGammaPrecalc();
-		log("%d-%d: {d: %d, k: %d, k_nn: %d, fvSize: %d, size(ToString): %d, size(grids): %d, shape(mu): %dx%d, shape(sigma): %dx%d, shape(w): %dx%d}", part.FeatStart, part.FeatEnd, d, k, k_nn, fvSize, ToString.size(), grids.size(), vocab.mu.rows, vocab.mu.cols, vocab.sigma.rows, vocab.sigma.cols, vocab.w.rows, vocab.w.cols);
+		log("%d-%d: {d: %d, k: %d, k_nn: %d, fvSize: %d, size(ToString): %d, shape(mu): %dx%d, shape(sigma): %dx%d, shape(w): %dx%d}", part.FeatStart, part.FeatEnd, d, k, k_nn, fvSize, ToString.size(), vocab.mu.rows, vocab.mu.cols, vocab.sigma.rows, vocab.sigma.cols, vocab.w.rows, vocab.w.cols);
 	}
 
 	void Update(float x, float y, float t, float* descr, int* nn)
 	{
-		if(!((uintptr_t(descr) & 15) == 0))
-		{
-			descr = descr_aligned.ptr<float>();
-			log("# Not aligned. Replacing by %lu", (unsigned long)descr_aligned.ptr<float>());
-		}
-	
-		assert((uintptr_t(descr) & 15) == 0);
+		assert((uintptr_t(descr) % 16) == 0);
 		
 		TIMERS.ComputeGamma.Start();
 		ComputeGamma(descr, nn);
 		TIMERS.ComputeGamma.Stop();
 		TIMERS.UpdateFv.Start();
-		UpdateFv(descr, nn, eff_FV.ptr<float>(eff.CellIndex(x, y, t)));
+		UpdateFv(descr, nn, eff_FV.ptr<float>(grid.CellIndex(x, y, t)));
 		TIMERS.UpdateFv.Stop();
 	}
 	
@@ -219,11 +174,6 @@ struct SpmFisherVector
 		pow(sigma, -1, sigma_m1);
 	}
 
-	double static inline sqr(double x)
-	{
-		return x * x;
-	}
-
 	void Done()
 	{
 		for(int i = 0; i < eff_FV.rows; i++)
@@ -238,51 +188,45 @@ struct SpmFisherVector
 				}
 			}
 		}
-	
-		for(int i = 0; i < grids.size(); i++)
+		
+		if(grid.nx == 1 && grid.ny == 1 && grid.nt == 1)
 		{
-			Grid& g = grids[i];
-			for(int xind = 0; xind < g.nx; xind++)
+			FV = eff_FV;
+			ToString.push_back(format("#FV %s %s (%d-%d), 0-0-0", grid.ToString, part.ToString.c_str(), part.FeatStart, part.FeatEnd));
+		}
+		else
+		{
+			FV = Mat_<float>::zeros(grid.nx + grid.ny + grid.nt, eff_FV.cols);
+			
+			ToString.push_back(format("#FV 1x1x1 %s (%d-%d), 0-0-0", part.ToString.c_str(), part.FeatStart, part.FeatEnd));
+			
+			for(int i = 0; i < grid.ny; i++)
 			{
-				for(int yind = 0; yind < g.ny; yind++)
-				{
-					for(int tind = 0; tind < g.nt; tind++)
-					{
-						Mat target = FV.row(firstCell[i] + g.Pos(xind, yind, tind));
-						int dx = eff.nx / g.nx;
-						int dy = eff.ny / g.ny;
-						int dt = eff.nt / g.nt;
-
-						for(int eff_xind = xind * dx; eff_xind < (1 + xind) * dx; eff_xind++)
-						{
-							
-							for(int eff_yind = yind * dy; eff_yind < (1 + yind) * dy; eff_yind++)
-							{
-								for(int eff_tind = tind * dt; eff_tind < (1 + tind) * dt; eff_tind++)
-								{
-									target += eff_FV.row(eff.Pos(eff_xind, eff_yind, eff_tind));
-								}
-							}
-						}
-					}
-				}
+				ToString.push_back(format("#FV 1x3x1 %s (%d-%d), 0-%d-0", part.ToString.c_str(), part.FeatStart, part.FeatEnd, i));
+				FV.row(1 + i) = eff_FV.row(grid.Pos(0, i, 0)) + eff_FV.row(grid.Pos(0, i, 1));
 			}
+			
+			for(int i = 0; i < grid.nt; i++)
+			{
+				ToString.push_back(format("#FV 1x1x2 %s (%d-%d), 0-0-%d", part.ToString.c_str(), part.FeatStart, part.FeatEnd, i));
+				FV.row(4 + i) = eff_FV.row(grid.Pos(0, 0, i)) + eff_FV.row(grid.Pos(0, 1, i)) + eff_FV.row(grid.Pos(0, 2, i));
+			}
+
+			FV.row(0) = FV.row(4) + FV.row(5);
 		}
 	}
 
 	float* gamma, *logdetnr, *lg;
-	Mat_<float> mu, sigma, w,sigma_m1;
-	Mat_<float> descr_aligned;
+	Mat_<float> mu, sigma, w, sigma_m1;
 	Mat_<float> FV, eff_FV;
 	vector<string> ToString;
-	vector<Grid> grids;
-	Grid eff;
+	Grid grid;
+	Part part;
 	int d;
 	int k;
 	int k_nn;
 	float* p;
 	bool do_sigma;
-	vector<int> firstCell;
 };
 
 #endif

@@ -31,24 +31,24 @@ Features (HOF, HOG, MBH enabled):
   Average HOF fps: 668.25
   Average MBH fps: 518.88
 
-Fisher vectors (components: 256, grids: ['1x1x1x', '1x3x1x', '1x1x2x', '2x2x1x', '2x2x2x', '1x3x2x'], updates/descriptor: 5, second order enabled: False, FLANN trees: 4, FLANN comparisons: 32):
-  Average total fps: 72.24
+Fisher vectors (components: 256, grids: ['1x1x1', '1x3x1', '1x1x2'], updates/descriptor: 5, second order enabled: False, FLANN trees: 4, FLANN comparisons: 32):
+  Average total fps: 101.73
 
 Classification:
-  AnswerPhone           AP = 0.3263
-  DriveCar              AP = 0.8860
-  Eat                   AP = 0.6263
-  FightPerson           AP = 0.7391
-  GetOutCar             AP = 0.5175
-  HandShake             AP = 0.3977
-  HugPerson             AP = 0.3839
-  Kiss                  AP = 0.6493
-  Run                   AP = 0.6991
-  SitDown               AP = 0.7160
-  SitUp                 AP = 0.3646
-  StandUp               AP = 0.7259
+  AnswerPhone           AP = 0.3368
+  DriveCar              AP = 0.8976
+  Eat                   AP = 0.6187
+  FightPerson           AP = 0.7357
+  GetOutCar             AP = 0.5383
+  HandShake             AP = 0.3676
+  HugPerson             AP = 0.3956
+  Kiss                  AP = 0.6409
+  Run                   AP = 0.7144
+  SitDown               AP = 0.7548
+  SitUp                 AP = 0.2775
+  StandUp               AP = 0.7344
 
-  mean: 0.5860
+  mean: 0.5843
 ```
 
 To remove all produced items (no worry, it will not remove the downloaded Hollywood-2 dataset), run:

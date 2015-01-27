@@ -1,8 +1,8 @@
-# Will link statically with OpenCV, Yael, OpenMP, OpenBLAS, gfortran. To link dynamically, remove "-Wl,-Bstatic" and "-Wl,-Bdynamic"
+# Will link statically with OpenCV, Yael, ATLAS, gfortran. To link dynamically, remove "-Wl,-Bstatic" and "-Wl,-Bdynamic"
 
 CFLAGS = -O3 -msse3 -std=c++0x
-LDFLAGS = -lopencv_flann -lopencv_core -Wl,-Bstatic -lyael -lgomp -lopenblas -lgfortran -Wl,-Bdynamic -lpthread -lz -lm -lc -lrt
-INSTALLED_DEPS = -I../../bin/3rdparty/include -L../../bin/3rdparty/lib 
+LDFLAGS = -lopencv_flann -lopencv_core -Wl,-Bstatic -lyael -lgomp -llapack -lf77blas -lcblas -latlas -lgfortran -Wl,-Bdynamic -lpthread -lz -lm -lc -lrt
+INSTALLED_DEPS = -I../../bin/dependencies/include -L../../bin/dependencies/lib 
 BIN = ../../bin/fastfv
 
 all: $(SOURCE_FILES)

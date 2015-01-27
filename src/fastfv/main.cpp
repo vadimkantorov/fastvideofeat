@@ -6,9 +6,9 @@
 #include <cctype>
 #include <fstream>
 #include <cstdlib>
-#include <cctype>
 #include <string>
 #include <vector>
+#include <memory>
 #include <stdexcept>
 #include <opencv/cv.h>
 
@@ -17,97 +17,71 @@
 #include "fisher_vector.h"
 #include "common.h"
 
-#include <memory>
+extern "C"
+{
+	#include <yael/gmm.h>
+	#include <yael/nn.h>
+}
 
+using namespace cv;
+using namespace cv::flann; 
 using namespace std;
 
 struct Options
 {
 	vector<Part> Parts;
-	vector<Grid> Grids;
 
 	int XnPos, YnPos, TnPos;
 	int K_nn;
-	float XnTotal, YnTotal, TnTotal;
-	float Lambda;
-	int FlannKdTrees;
-	int FlannChecks;
-	bool DoSigma;
+	int FlannKdTrees, FlannChecks;
+	bool DoSigma, EnableGrids;
 
 	Options(int argc, char* argv[])
 	{
-		Lambda = 1e-4;
 		K_nn = 5;
-		DoSigma = false;
-		FlannKdTrees = 4;
-		FlannChecks = 32;
+		EnableGrids = DoSigma = false;
+		FlannKdTrees = FlannChecks = -1;
 		XnPos = YnPos = TnPos = -1;
-		XnTotal = YnTotal = TnTotal = 1.0;
 		
-		for(int i = 1; i < argc; )
+		for(int i = 1; i < argc; i++)
 		{
-			if(strcmp(argv[i], "--lambda") == 0)
-			{
-				sscanf(argv[i+1], "%f", &Lambda);
-				i += 2;
-			}
-			else if(strcmp(argv[i], "--updatesperdescriptor") == 0)
+			if(strcmp(argv[i], "--knn") == 0)
 			{
 				K_nn = atoi(argv[i+1]);
-				i += 2;
+				i++;
 			}
-			else if(strcmp(argv[i], "--flann_ntrees") == 0)
+			else if(strcmp(argv[i], "--enableflann") == 0)
 			{
-				FlannKdTrees = atoi(argv[i+1]);
-				i += 2;
-			}
-			else if(strcmp(argv[i], "--flann_ncomparisons") == 0)
-			{
-				FlannChecks = atoi(argv[i+1]);
-				i += 2;
+				FlannKdTrees = 4;
+				FlannChecks = 32;
+				
+				if(i + 2 < argc && sscanf(argv[i + 1], "%d", &FlannKdTrees) == 1 && sscanf(argv[i + 2], "%d", &FlannChecks) == 1)
+				{
+					i += 2;
+				}
 			}
 			else if(strcmp(argv[i], "--enablesecondorder") == 0)
 			{
 				DoSigma = true;
+			}
+			else if(strcmp(argv[i], "--xpos") == 0)
+			{
+				XnPos = atoi(argv[i + 1]);
 				i++;
 			}
-			else if(strcmp(argv[i], "--xtot") == 0)
+			else if(strcmp(argv[i], "--ypos") == 0)
 			{
-				XnTotal = atoi(argv[i+1]);
-				i += 2;
+				YnPos = atoi(argv[i + 1]);
+				i++;
 			}
-			else if(strcmp(argv[i], "--ytot") == 0)
+			else if(strcmp(argv[i], "--tpos") == 0)
 			{
-				YnTotal = atoi(argv[i+1]);
-				i += 2;
+				TnPos = atoi(argv[i + 1]);
+				i++;
 			}
-			else if(strcmp(argv[i], "--ttot") == 0)
+			else if(strcmp(argv[i], "--enablespatiotemporalgrids") == 0)
 			{
-				TnTotal = atoi(argv[i+1]);
-				i += 2;
-			}
-			else if(strcmp(argv[i], "--xnpos") == 0)
-			{
-				XnPos = atoi(argv[i+1]);
-				i += 2;
-			}
-			else if(strcmp(argv[i], "--ynpos") == 0)
-			{
-				YnPos = atoi(argv[i+1]);
-				i += 2;
-			}
-			else if(strcmp(argv[i], "--tnpos") == 0)
-			{
-				TnPos = atoi(argv[i+1]);
-				i += 2;
-			}
-			else if(strcmp(argv[i], "--grid") == 0)
-			{
-				int nx, ny, nt;
-				sscanf(argv[i+1], "%dx%dx%d", &nx, &ny, &nt);
-				Grid g(nx, ny, nt);
-				Grids.push_back(g);
-				i += 2;
+				EnableGrids = true;
 			}
 			else if(strcmp(argv[i], "--vocab") == 0)
 			{
@@ -115,7 +89,7 @@ struct Options
 				sscanf(argv[i+1], "%d-%d", &a, &b);
 				Part p(a, b, argv[i + 2]);
 				Parts.push_back(p);
-				i += 3;
+				i += 2;
 			}
 			else
 				throw runtime_error("Unknown option: " + string(argv[i]));
@@ -127,24 +101,15 @@ struct Options
 		{
 			log("# %d-%d\t'%s'", Parts[i].FeatStart, Parts[i].FeatEnd, Parts[i].VocabPath.c_str()); 
 		}
-		log("Lambda reg: %f", Lambda);
 		log("K_nn: %d", K_nn);
-		log("FLANN trees: %d", FlannKdTrees);
-		log("FLANN checks: %d", FlannChecks);
-		log("Enable second order: %s", DoSigma ? "yes" : "no");
 		log("pos: {XnPos: %d, YnPos: %d, TnPos: %d}", XnPos, YnPos, TnPos);
-		log("tot: {Xtot: %f, Ytot: %f, Ttot: %f}", XnTotal, YnTotal, TnTotal);
-		fprintf(stderr, "Grids: [");
-		for(int i = 0; i < Grids.size(); i++)
-		{
-			fprintf(stderr, "%s, ", Grids[i].ToString);
-		}
-		log("]");
+		log("FLANN: {trees: %d, checks: %d}", FlannKdTrees, FlannChecks);
+		log("Enable second order: %s", DoSigma ? "yes" : "no");
+		log("Enable spatio-temporal grids (1x1x1, 1x3x1, 1x1x2): %s", EnableGrids ? "yes" : "no");
 
 		assert(XnPos != -1);
 		assert(YnPos != -1);
 		assert(TnPos != -1);
-		assert(Grids.size() > 0);
 		assert(Parts.size() > 0);
 	}
 };
@@ -178,35 +143,33 @@ int ReadBlock(float* features, int rows, int cols)
 
 int main(int argc, char* argv[])
 {
+	TIMERS.Total.Start();
 	Options opts(argc, argv);
 	vector<Part>& parts = opts.Parts;
-	TIMERS.Total.Start();
 	
-	Mat_<float> features(10000, 500);
-
-	int k_nn = opts.K_nn;
-					
-	Mat_<int> assigned(features.rows, k_nn);
-	Mat_<float> dists_dummy(features.rows, k_nn);
+	TIMERS.Vocab.Start();
+	KDTreeIndexParams ass_indexParams(opts.FlannKdTrees != -1 ? opts.FlannKdTrees : 4);
+	SearchParams ass_pars(opts.FlannChecks != -1 ? opts.FlannChecks : 32);
 	
-	typedef cv::flann::Index Index;
-	cv::flann::KDTreeIndexParams ass_indexParams(opts.FlannKdTrees);
-	cv::flann::SearchParams ass_pars(opts.FlannChecks);
-			
+	vector<GmmVocab> vocabs;
 	vector<shared_ptr<Index> > indices;
 	vector<SpmFisherVector> spms;
-
-	TIMERS.Vocab.Start();
+	
 	for(int i = 0; i < parts.size(); i++)
 	{
 		Part& p = parts[i];
-		GmmVocab vocab(p.VocabPath, opts.Lambda);
+		GmmVocab vocab(p.VocabPath);
 
+		vocabs.push_back(vocab);
 		indices.push_back(make_shared<Index>(vocab.mu, ass_indexParams));
-		spms.push_back(SpmFisherVector(opts.Grids, vocab, p, k_nn, opts.DoSigma));
+		spms.push_back(SpmFisherVector(opts.EnableGrids, vocab, p, opts.K_nn, opts.DoSigma));
 	}
 	TIMERS.Vocab.Stop();
 	log("# Vocab loaded");
+	
+	Mat_<float> features(1000, 500);
+	Mat_<int> assigned(features.rows, opts.K_nn);
+	Mat_<float> dists_dummy(features.rows, opts.K_nn);
 
 	int cnt;
 	while((cnt = ReadBlock(features.ptr<float>(), features.rows, features.cols)) > 0)
@@ -216,25 +179,28 @@ int main(int argc, char* argv[])
 
 		for(int partInd = 0; partInd < parts.size(); partInd++)
 		{
-			Part& p = parts[partInd];
-			shared_ptr<Index> ass_index = indices[partInd];
-			SpmFisherVector& spm = spms[partInd];
-
 			TIMERS.Copying.Start();
-			Mat_<float> fts = features(Range::all(), Range(p.FeatStart, 1+p.FeatEnd)).clone();
+			Mat_<float> fts = features(Range::all(), Range(parts[partInd].FeatStart, 1 + parts[partInd].FeatEnd)).clone();
 			TIMERS.Copying.Stop();
 	
 			TIMERS.FLANN.Start();
-			ass_index->knnSearch(fts, assigned, dists_dummy, k_nn, ass_pars);
+			if(opts.FlannKdTrees != -1 && opts.FlannChecks != -1)
+			{
+				shared_ptr<Index> ass_index = indices[partInd];
+				ass_index->knnSearch(fts, assigned, dists_dummy, opts.K_nn, ass_pars);
+			}
+			else
+			{
+				Mat mu = vocabs[partInd].mu;
+				knn(fts.rows, mu.rows, mu.cols, opts.K_nn, mu.ptr<float>(), fts.ptr<float>(), assigned.ptr<int>());
+			}
 			TIMERS.FLANN.Stop();
 	
 			TIMERS.Assigning.Start();
+			SpmFisherVector& spm = spms[partInd];
 			for(int i = 0; i < cnt; i++)
 			{
-				float x = features(i, opts.XnPos) / opts.XnTotal;
-				float y = features(i, opts.YnPos) / opts.YnTotal;
-				float t = features(i, opts.TnPos) / opts.TnTotal;
-				spm.Update(x, y, t,	fts.ptr<float>(i), assigned.ptr<int>(i));
+				spm.Update(features(i, opts.XnPos), features(i, opts.YnPos), features(i, opts.TnPos), fts.ptr<float>(i), assigned.ptr<int>(i));
 			}
 			TIMERS.Assigning.Stop();
 			TIMERS.OpCount += cnt;

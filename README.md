@@ -76,25 +76,32 @@ The tool accepts descriptors on the standard input and writes Fisher vector (FV)
 
 Option | Default | Description
 --- | --- | ---
---xnpos 0 | | specifies the column with **x** coordinate of the s-t patch in the descriptor array
---xtot 1.0 | 1.0 | specifies the frame width. If the **x** coordinate is non-normalized, this option is mandatory
---ynpos 1 | | specifies the column with **y** coordinate of the s-t patch in the descriptor array
---ytot 1.0 | 1.0 | specifies the frame height. If the **y** coordinate is non-normalized, this option is mandatory
---tnpos 2 | | specifies the column with **t** coordinate of the s-t patch in the descriptor array
---ttot 192 | 1.0 | specifies the number of frames in the video (actually the last PTS of the video, usually the two are equivalent, but not always). If the **t** coordinate is non-normalized, this option is mandatory
---gmm_ncomponents 256 | 256 | specifies the number of GMM components used for FV computation
---updatesperdescriptor 5 | 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
---enablesecondorder | | Enables second-order part of the Fisher vector
+--xpos 0 | | specifies the column with **x** coordinate of the s-t patch in the descriptor array
+--ypos 1 | | specifies the column with **y** coordinate of the s-t patch in the descriptor array
+--tpos 2 | | specifies the column with **t** coordinate of the s-t patch in the descriptor array
+--knn 5 | 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
 --vocab 9-104 hog_K256.gmm | | specifies descriptor type location and path to GMM vocab. This option is mandatory, and several options of this kind are allowed.
---grid 1x3x2x | | specifies the layout of the s-t grid (**x** cells times **y** cells times **t** cells). This option is mandatory, and several options of this kind are allowed.
-
+--enableflann 4 32 | knn is used instead of flann | use FLANN for descriptor attribution, first argument is number of kd-trees, second argument is number of checks performed during attribution
+--enablespatiotemporalgrids | | enables spatio-temporal grids: 1x1x1, 1x3x1, 1x1x2
+--enablesecondorder | | enables second-order part of the Fisher vector
 
 ##### Examples:
   - Compute Fisher vector:
+    > $ zcat sample_features_mpeg4.txt.gz | ./bin/fastfv --xpos 0 --ypos 1 --tpos 2 --enablespatiotemporalgrids --enableflann 4 32 --vocab 10-105 hollywood2_sample_vocabs/10-105.hog.gmm --vocab 106-213 hollywood2_sample_vocabs/106-213.hog.gmm --vocab 214-309 hollywood2_sample_vocabs/214-309.mbhx.gmm --vocab 310-405 hollywood2_sample_vocabs/310-405.mbhy.gmm > fv.txt
 
-    > $ zcat sample_features_mpeg4.txt.gz | ./fastfv --vocab 9-104 hollywood2_sample_vocabs/hog_K256.gmm --vocab 105-212 hollywood2_sample_vocabs/hof_K256.gmm --vocab 213-308 hollywood2_sample_vocabs/mbhx_K256.gmm --vocab 309-404 hollywood2_sample_vocabs/mbhy_K256.gmm --xnpos 0 --ynpos 1 --tnpos 2 --grid 1x1x1x --grid 2x2x1x --grid 1x3x1x --grid 1x1x2x --grid 2x2x2x --grid 1x3x2x --ttot 192 > fv.txt
+  - Build GMM vocab with Yael:
+    > $ PYTHONPATH=./bin/dependencies/yael:$PYTHONPATH cat features*.gz | ./src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
 
-Examples are explained in *samples/compute_fisher_vector.sh*. 
+Examples are explained in *samples/compute_fisher_vector.sh*.
+
+##### Performance
+We haven't observed enabling second order boosts accuracy, so it's disabled by default. Enabling second order part increases Fisher vector size twice.
+
+Using simple knn descriptor attribution (default) beats FLANN in speed by a factor of two, however leads to ~1% accuracy degradation in spatio-temporal grids regime.
+
+Enabling spatio-temporal grids (disabled by default) is important for maximum accuracy (~2% gain).
+
+The FLANN parameter that influences speeed is the number of checks, try reducing it to gain speed.
 
 # Building from source
 
@@ -106,7 +113,7 @@ Dependencies for **fastvideofeat**:
 
 Dependencies for **fastfv**:
  - opencv (http://opencv.org)
- - yael (http://gforge.inria.fr/projects/yael/)
+ - yael (http://gforge.inria.fr/projects/yael/), ATLAS with LAPACK (required by yael)
 
 The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. 
 
@@ -122,6 +129,8 @@ To build **fastvideofeat**, set in Makefile the good paths to the dependencies, 
 # Notes
 
 For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on text file reading/writing is huge.
+
+We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
 
 # License
 MIT
