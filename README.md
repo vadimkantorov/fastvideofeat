@@ -28,7 +28,7 @@ We release two tools in this repository. The first tool **fastvideofeat** is a m
 
 We also release scripts (in the *repro* directory) for reproducing our results on Hollywood-2 dataset.
 
-All code is released under MIT license.
+All code is released under the [MIT license](http://github.com/vadimkantorov/cvpr2014/blob/master/LICENSE).
 
 ### fastvideofeat
 
@@ -133,4 +133,4 @@ For practical usage, software needs to be modified to save and read features in 
 We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
 
 # License
-MIT
+All code and scripts are licensed under the [MIT license](http://github.com/vadimkantorov/cvpr2014/blob/master/LICENSE).
