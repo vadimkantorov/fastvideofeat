@@ -55,5 +55,5 @@ To remove all produced items (no worry, it will not remove the downloaded Hollyw
 > $ make clean
 
 # Notes
-Key parameters are specified on top of the Makefile. You may try to change some, hopefully everything will still work.
+Key parameters are specified on top of the Makefile and explained in the [Performance section](https://github.com/vadimkantorov/cvpr2014/#performance). You could play with them, hopefully everything will still work.
 Features and Fisher vectors are not compressed for the sake of script clarity. For practical usage, feel free to modify the script to use gzip compression or modify the tools to output floats in binary format.
