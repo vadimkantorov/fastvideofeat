@@ -68,6 +68,9 @@ Every line on standard output corresponds to an extracted descriptor of a patch 
 
 More examples in *samples/compute_mpeg_features.sh*.
 
+##### Video format support
+We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
+
 ### fastfv
 The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by Yael library. A [sample script](https://github.com/vadimkantorov/cvpr2014/blob/master/src/gmm_train.py) to build GMM vocabs with Yael is provided, as well as its [usage example](https://github.com/vadimkantorov/cvpr2014/blob/master/samples/compute_fisher_vectors.sh).
 
@@ -127,10 +130,7 @@ To build **fastvideofeat**, set in Makefile the good paths to the dependencies, 
  > $ nmake -f Makefile.nmake
 
 # Notes
-
 For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on text file reading/writing is huge.
-
-We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
 
 # License
 All code and scripts are licensed under the [MIT license](http://github.com/vadimkantorov/cvpr2014/blob/master/LICENSE).
