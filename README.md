@@ -132,5 +132,7 @@ To build **fastvideofeat**, set in Makefile the good paths to the dependencies, 
 # Notes
 For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on text file reading/writing is huge.
 
-# License
+# License and acknowledgements
 All code and scripts are licensed under the [MIT license](http://github.com/vadimkantorov/cvpr2014/blob/master/LICENSE).
+
+We greatly thank [Heng Wang's work](http://lear.inrialpes.fr/people/wang/improved_trajectories) for inspiration.
