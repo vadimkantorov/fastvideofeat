@@ -90,7 +90,7 @@ Option | Default | Description
     > $ zcat sample_features_mpeg4.txt.gz | ./bin/fastfv --xpos 0 --ypos 1 --tpos 2 --enablespatiotemporalgrids --enableflann 4 32 --vocab 10-105 hollywood2_sample_vocabs/10-105.hog.gmm --vocab 106-213 hollywood2_sample_vocabs/106-213.hog.gmm --vocab 214-309 hollywood2_sample_vocabs/214-309.mbhx.gmm --vocab 310-405 hollywood2_sample_vocabs/310-405.mbhy.gmm > fv.txt
 
   - Build GMM vocab with Yael:
-    > $ PYTHONPATH=./bin/dependencies/yael:$PYTHONPATH cat features*.gz | ./src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
+    > $ PYTHONPATH=$(pwd)/bin/dependencies/yael:$PYTHONPATH cat features*.gz | ./src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
 
 Examples are explained in *samples/compute_fisher_vector.sh*.
 

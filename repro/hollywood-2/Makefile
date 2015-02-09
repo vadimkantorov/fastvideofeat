@@ -4,7 +4,7 @@ FASTFV_KNN = 5
 FASTFV_FLANN_NTREES = 4
 FASTFV_FLANN_NCOMPARISONS = 32
 # comment next line to disable flann
-FASTFV_QUANTIZER = --enableflann $(FASTFV_FLANN_NTREES) $(FASTFV_FLANN_NCOMPARISONS)
+#FASTFV_QUANTIZER = --enableflann $(FASTFV_FLANN_NTREES) $(FASTFV_FLANN_NCOMPARISONS)
 # comment next line to disable s-t grids
 FV_SPATIO_TEMPORAL_GRIDS = --enablespatiotemporalgrids
 # comment next line and uncomment the one after to use yael
@@ -15,7 +15,7 @@ FV = $(FASTFV)
 FASTVIDEOFEAT = ../../bin/fastvideofeat
 FASTFV = ../../bin/fastfv
 YAELDIR = ../../bin/dependencies/yael
-export PYTHONPATH := $(YAELDIR):$(PYTHONPATH)
+export PYTHONPATH := $(shell pwd)/$(YAELDIR):$(PYTHONPATH)
 
 # repro below
 trainClips = $(shell seq 823 | xargs printf "actioncliptrain%05d.avi ")

@@ -159,7 +159,6 @@ int main(int argc, char* argv[])
 	{
 		Part& p = parts[i];
 		GmmVocab vocab(p.VocabPath);
-
 		vocabs.push_back(vocab);
 		indices.push_back(make_shared<Index>(vocab.mu, ass_indexParams));
 		spms.push_back(SpmFisherVector(opts.EnableGrids, vocab, p, opts.K_nn, opts.DoSigma));
@@ -192,15 +191,14 @@ int main(int argc, char* argv[])
 			else
 			{
 				Mat mu = vocabs[partInd].mu;
-				knn(fts.rows, mu.rows, mu.cols, opts.K_nn, mu.ptr<float>(), fts.ptr<float>(), assigned.ptr<int>());
+				knn_full (2, fts.rows, mu.rows, mu.cols, opts.K_nn, mu.ptr<float>(), fts.ptr<float>(), NULL, assigned.ptr<int>(), dists_dummy.ptr<float>());
 			}
 			TIMERS.FLANN.Stop();
 	
 			TIMERS.Assigning.Start();
-			SpmFisherVector& spm = spms[partInd];
 			for(int i = 0; i < cnt; i++)
 			{
-				spm.Update(features(i, opts.XnPos), features(i, opts.YnPos), features(i, opts.TnPos), fts.ptr<float>(i), assigned.ptr<int>(i));
+				spms[partInd].Update(features(i, opts.XnPos), features(i, opts.YnPos), features(i, opts.TnPos), fts.ptr<float>(i), assigned.ptr<int>(i));
 			}
 			TIMERS.Assigning.Stop();
 			TIMERS.OpCount += cnt;

@@ -18,7 +18,7 @@ niter = 50
 nthreads = 1
 seed = 0
 redo = 1
-flags = yael.GMM_FLAGS_MU | yael.GMM_FLAGS_SIGMA | yael.GMM_FLAGS_NO_NORM
+flags = yael.GMM_FLAGS_W
 gmm = yael.gmm_learn(nfeatures, npoints, args.gmm_ncomponents, niter, yael.FloatArray.acquirepointer(yael.numpy_to_fvec(data)), nthreads, seed, redo, flags)
 
 yael.gmm_write(gmm, open(args.vocab[1], 'w'))

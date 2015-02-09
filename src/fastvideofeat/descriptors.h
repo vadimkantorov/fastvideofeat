@@ -35,7 +35,7 @@ Mat BuildOrientationIntegralTransform(DescInfo descInfo, Mat_<float> dx, Mat_<fl
 	int angleBins = descInfo.applyThresholding ? descInfo.nBins - 1 : descInfo.nBins;
 
 	double fullAngle = descInfo.signedGradient ? 360 : 180;
-	float angleBase = fullAngle/double(angleBins);
+	float inv_angleBase = 1 / (fullAngle/double(angleBins));
 	
 	float* ptr_dx = dx.ptr<float>();
 	float* ptr_dy = dy.ptr<float>();
@@ -50,6 +50,7 @@ Mat BuildOrientationIntegralTransform(DescInfo descInfo, Mat_<float> dx, Mat_<fl
 		{
 			float shiftX = ptr_dx[index];
 			float shiftY = ptr_dy[index];
+			
 			float m0 = sqrt(shiftX*shiftX+shiftY*shiftY);//FastSquareRootFloat(shiftX*shiftX + shiftY*shiftY);
 			float m1 = m0;
 
@@ -66,18 +67,22 @@ Mat BuildOrientationIntegralTransform(DescInfo descInfo, Mat_<float> dx, Mat_<fl
 				float orientation = fastAtan2(shiftY, shiftX);
 				if(orientation > fullAngle)
 					orientation -= fullAngle;
-
-				float fbin = orientation/angleBase;
+				
+				float fbin = orientation * inv_angleBase;
 				bin0 = cvFloor(fbin);
-				float weight0 = 1 - (fbin - bin0);
-				float weight1 = 1 - weight0;
-				bin0 %= angleBins;
-				bin1 = (bin0+1)%angleBins;
-				//bin0 &= 7;
-				//bin1 = (bin0 + 1) & 7;
+				bin1 = (bin0 + 1) % angleBins;
 
-				m0 *= weight0;
-				m1 *= weight1;
+				m1 = (fbin - bin0)*m0;
+				m0 -= m1;
+
+				//bin0 = cvFloor(fbin);
+				//float weight0 = 1 - (fbin - bin0);
+				//float weight1 = 1 - weight0;
+				//bin0 %= angleBins;
+				//bin1 = (bin0+1)%angleBins;
+
+				//m0 *= weight0;
+				//m1 *= weight1;
 			}
 
 			sum[bin0] += m0;
