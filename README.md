@@ -68,22 +68,25 @@ Every line on standard output corresponds to an extracted descriptor of a patch 
 
 More examples in *samples/compute_mpeg_features.sh*.
 
+##### Video format support
+We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
+
 ### fastfv
 The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by Yael library. A [sample script](https://github.com/vadimkantorov/cvpr2014/blob/master/src/gmm_train.py) to build GMM vocabs with Yael is provided, as well as its [usage example](https://github.com/vadimkantorov/cvpr2014/blob/master/samples/compute_fisher_vectors.sh).
 
 **IMPORTANT** The computed Fisher vectors are non-normalized, apply signed square rooting / power normalization, L2-normalization, clipping etc before training a classifier.
 ##### Command-line options:
 
-Option | Default | Description
---- | --- | ---
---xpos 0 | | specifies the column with **x** coordinate of the s-t patch in the descriptor array
---ypos 1 | | specifies the column with **y** coordinate of the s-t patch in the descriptor array
---tpos 2 | | specifies the column with **t** coordinate of the s-t patch in the descriptor array
---knn 5 | 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
---vocab 9-104 hog_K256.gmm | | specifies descriptor type location and path to GMM vocab. This option is mandatory, and several options of this kind are allowed.
---enableflann 4 32 | knn is used instead of flann | use FLANN for descriptor attribution, first argument is number of kd-trees, second argument is number of checks performed during attribution
---enablespatiotemporalgrids | | enables spatio-temporal grids: 1x1x1, 1x3x1, 1x1x2
---enablesecondorder | | enables second-order part of the Fisher vector
+Option | Description
+--- | ---
+--xpos 0 | specifies the column with **x** coordinate of the s-t patch in the descriptor array
+--ypos 1 | specifies the column with **y** coordinate of the s-t patch in the descriptor array
+--tpos 2 | specifies the column with **t** coordinate of the s-t patch in the descriptor array
+--knn 5 | FV parts corresponding to these many closest GMM centroids will be updated during processing of every input descriptor
+--vocab 10-105 10-105.hog.gmm | specifies descriptor type location and path to GMM vocab. This option is mandatory, and several options of this kind are allowed.
+--enableflann 4 32 | use FLANN instead of knn for descriptor attribution, first argument is number of kd-trees, second argument is number of checks performed during attribution
+--enablespatiotemporalgrids | enables spatio-temporal grids: 1x1x1, 1x3x1, 1x1x2
+--enablesecondorder | enables second-order part of the Fisher vector
 
 ##### Examples:
   - Compute Fisher vector:
@@ -97,9 +100,9 @@ Examples are explained in *samples/compute_fisher_vector.sh*.
 ##### Performance
 We haven't observed enabling second order boosts accuracy, so it's disabled by default. Enabling second order part increases Fisher vector size twice.
 
-Using simple knn descriptor attribution (default) beats FLANN in speed by a factor of two, however leads to ~1% accuracy degradation in spatio-temporal grids regime.
+Using simple knn descriptor attribution (default) beats FLANN in speed by a factor of two, however leads to ~1% accuracy degradation in spatio-temporal grids regime. However it's enabled by default because of its speed. 
 
-Enabling spatio-temporal grids (disabled by default) is important for maximum accuracy (~2% gain).
+Enabling spatio-temporal grids (disabled by default) is important for maximum accuracy (~2% gain), so it's enabled by default.
 
 The FLANN parameter that influences speeed is the number of checks, try reducing it to gain speed.
 
@@ -127,10 +130,9 @@ To build **fastvideofeat**, set in Makefile the good paths to the dependencies, 
  > $ nmake -f Makefile.nmake
 
 # Notes
-
 For practical usage, software needs to be modified to save and read features in some binary format, because the overhead on text file reading/writing is huge.
 
-We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
-
-# License
+# License and acknowledgements
 All code and scripts are licensed under the [MIT license](http://github.com/vadimkantorov/cvpr2014/blob/master/LICENSE).
+
+We greatly thank [Heng Wang](http://lear.inrialpes.fr/people/wang) and [his work](http://lear.inrialpes.fr/people/wang/improved_trajectories) which was of significant help. 
