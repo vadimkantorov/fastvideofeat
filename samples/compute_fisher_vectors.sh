@@ -2,7 +2,7 @@
 FASTFV=../bin/fastfv
 
 # Compute GMM vocabs for HOG / HOF / MBH. Lines below commented because we don't provide a feature archive.
-# YAELDIR=$(pwd)/../bin/dependencies/yael
+# YAELDIR=$(pwd)/../bin/dependencies/yael/yael
 # export PYTHONPATH=$YAELDIR:$PYTHONPATH
 # cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
 # cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 106-213 106-213.hog.gmm

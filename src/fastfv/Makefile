@@ -2,7 +2,7 @@
 
 CFLAGS = -O3 -msse3 -std=c++0x
 LDFLAGS = -lopencv_flann -lopencv_core -Wl,-Bstatic -lyael -lgomp -llapack -lf77blas -lcblas -latlas -lgfortran -Wl,-Bdynamic -lpthread -lz -lm -lc -lrt
-INSTALLED_DEPS = -I../../bin/dependencies/include -L../../bin/dependencies/lib 
+INSTALLED_DEPS = -I../../bin/dependencies/include -L../../bin/dependencies/lib -I../../bin/dependencies/yael -L../../bin/dependencies/yael/yael
 BIN = ../../bin/fastfv
 
 all: $(SOURCE_FILES)

@@ -14,7 +14,7 @@ FV = $(FASTFV)
 # Tools paths
 FASTVIDEOFEAT = ../../bin/fastvideofeat
 FASTFV = ../../bin/fastfv
-YAELDIR = ../../bin/dependencies/yael
+YAELDIR = ../../bin/dependencies/yael/yael
 export PYTHONPATH := $(shell pwd)/$(YAELDIR):$(PYTHONPATH)
 
 # repro below
@@ -32,14 +32,21 @@ fisher_vectors = $(addprefix data/fisher_vectors/, $(addsuffix .txt, $(allClips)
 kernel = data/kernel.txt
 vlfeat = vlfeat-0.9.19/toolbox/plotop/vl_pr.m
 classification = data/classification.txt
+report = data/report.txt
+artefactDirs = data/features data/vocabs data/fisher_vectors logs/features logs/fisher_vectors logs/vocabs 
 
 log = $(subst data, logs, $@).log
 vocab = $(basename $(basename $(notdir $(1)))) $(1)
 
-all: $(classification)
-	./report.py
+all: $(report)
+	cat $(report)
 
-$(features): $(dataset)
+$(artefactDirs) data/dataset:
+	mkdir -p $@
+
+$(dataset): $(videoDir)
+
+$(features): $(dataset) $(artefactDirs)
 	$(FASTVIDEOFEAT) $(videoDir)/$(basename $(notdir $@)) > $@ 2> $(log)
 
 $(features_sampled): $(features)
@@ -57,17 +64,18 @@ $(kernel) : $(fisher_vectors)
 $(classification) : $(kernel) $(vlfeat)
 	cat $(kernel) | ./classify.py $(evalDir) $(basename $(allClips)) > $@
 
-.PHONY: all get_hwd2 get_vlfeat clean
+$(report): $(classification)
+	./report.py > $@
 
-get_hwd2:
+$(videoDir): data/dataset
 	wget ftp://ftp.irisa.fr/local/vistas/actions/Hollywood2-actions.tar.gz
 	tar -C data/dataset -xf Hollywood2-actions.tar.gz
 	rm Hollywood2-actions.tar.gz
 
-get_vlfeat:
+$(vlfeat):
 	wget https://github.com/vlfeat/vlfeat/archive/v0.9.19.tar.gz
 	tar -xf v0.9.19.tar.gz
 	rm v0.9.19.tar.gz
 
 clean:
-	rm -rf data/features/* data/features_sampled.txt data/vocabs/* data/fisher_vectors/* data/kernel.txt logs/features/* logs/fisher_vectors/* logs/vocabs/*
+	rm -rf $(artefactDirs) $(features_sampled) $(kernel) $(classification) $(report)

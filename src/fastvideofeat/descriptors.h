@@ -74,15 +74,6 @@ Mat BuildOrientationIntegralTransform(DescInfo descInfo, Mat_<float> dx, Mat_<fl
 
 				m1 = (fbin - bin0)*m0;
 				m0 -= m1;
-
-				//bin0 = cvFloor(fbin);
-				//float weight0 = 1 - (fbin - bin0);
-				//float weight1 = 1 - weight0;
-				//bin0 %= angleBins;
-				//bin1 = (bin0+1)%angleBins;
-
-				//m0 *= weight0;
-				//m1 *= weight1;
 			}
 
 			sum[bin0] += m0;
