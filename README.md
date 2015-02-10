@@ -126,7 +126,7 @@ Make sure you have the dependencies installed and visible to g++ (a minimal inst
 ### Windows
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
 
-To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run from a Visual Studio Developer Command Prompt:
+To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run from an appropriate Visual Studio Developer Command Prompt (specifically, VS2013 x64 Native Tools Command Prompt worked for us):
  > $ nmake -f Makefile.nmake
 
 # Notes
