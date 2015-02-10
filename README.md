@@ -90,10 +90,10 @@ Option | Description
 
 ##### Examples:
   - Compute Fisher vector:
-    > $ zcat sample_features_mpeg4.txt.gz | ./bin/fastfv --xpos 0 --ypos 1 --tpos 2 --enablespatiotemporalgrids --enableflann 4 32 --vocab 10-105 hollywood2_sample_vocabs/10-105.hog.gmm --vocab 106-213 hollywood2_sample_vocabs/106-213.hog.gmm --vocab 214-309 hollywood2_sample_vocabs/214-309.mbhx.gmm --vocab 310-405 hollywood2_sample_vocabs/310-405.mbhy.gmm > fv.txt
+    > $ zcat sample_features_mpeg4.txt.gz | ../bin/fastfv --xpos 0 --ypos 1 --tpos 2 --enablespatiotemporalgrids --enableflann 4 32 --vocab 10-105 hollywood2_sample_vocabs/10-105.hog.gmm --vocab 106-213 hollywood2_sample_vocabs/106-213.hog.gmm --vocab 214-309 hollywood2_sample_vocabs/214-309.mbhx.gmm --vocab 310-405 hollywood2_sample_vocabs/310-405.mbhy.gmm > fv.txt
 
   - Build GMM vocab with Yael:
-    > $ PYTHONPATH=$(pwd)/bin/dependencies/yael:$PYTHONPATH cat features*.gz | ./src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
+    > $ PYTHONPATH=$(pwd)/../bin/dependencies/yael/yael:$PYTHONPATH cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
 
 Examples are explained in *samples/compute_fisher_vector.sh*.
 
@@ -126,7 +126,7 @@ Make sure you have the dependencies installed and visible to g++ (a minimal inst
 ### Windows
 Only **fastvideofeat** builds and works on Windows, **fastfv** doesn't build because yael currently does not support Windows.
 
-To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run from a Visual Studio Developer Command Prompt:
+To build **fastvideofeat**, set in Makefile the good paths to the dependencies, processor architecture and Visual C++ version, and run from an appropriate Visual Studio Developer Command Prompt (specifically, VS2013 x64 Native Tools Command Prompt worked for us):
  > $ nmake -f Makefile.nmake
 
 # Notes
