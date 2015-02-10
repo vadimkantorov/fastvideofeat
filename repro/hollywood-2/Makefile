@@ -1,12 +1,15 @@
 # Parameter settings
 FV_GMM_NCOMPONENTS = 256
 FASTFV_KNN = 5
-FASTFV_FLANN_NTREES = 4
-FASTFV_FLANN_NCOMPARISONS = 32
-# comment next line to disable flann
+
+# uncomment next three lines to enable flann
+#FASTFV_FLANN_NTREES = 4
+#FASTFV_FLANN_NCOMPARISONS = 32
 #FASTFV_QUANTIZER = --enableflann $(FASTFV_FLANN_NTREES) $(FASTFV_FLANN_NCOMPARISONS)
+
 # comment next line to disable s-t grids
 FV_SPATIO_TEMPORAL_GRIDS = --enablespatiotemporalgrids
+
 # comment next line and uncomment the one after to use yael
 FV = $(FASTFV)
 #FV = ./yaelfv.py
