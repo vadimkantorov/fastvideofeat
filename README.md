@@ -118,7 +118,7 @@ Dependencies for **fastfv**:
  - opencv (http://opencv.org)
  - yael (http://gforge.inria.fr/projects/yael/), ATLAS with LAPACK (required by yael)
 
-The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.01. 
+The code is known to work with OpenCV 2.4.9, FFmpeg 2.4, Yael 4.38. 
 
 ### Linux
 Make sure you have the dependencies installed and visible to g++ (a minimal installation script is in the *bin* directory). Build the tools by running **make**.
