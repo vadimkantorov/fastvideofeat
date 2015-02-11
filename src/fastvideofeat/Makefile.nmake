@@ -8,9 +8,8 @@ LIBPATH = /LIBPATH:$(OPENCV_DIR)/$(OPENCV_ARCH)/$(VC_VERSION)/staticlib /LIBPATH
 LIBS = zlib.lib opencv_core249.lib opencv_imgproc249.lib avcodec.lib avformat.lib avutil.lib swscale.lib swresample.lib
 BIN = ../../bin/fastvideofeat.exe
 
-all: $(SOURCE_FILES)
-	if not exist build (mkdir build)
-	if not exist inttypes.h (if exist msinttypes.h (rename msinttypes.h inttypes.h))
+all:
+	if exist msinttypes.h (rename msinttypes.h inttypes.h)
 	cl /MT /EHsc $(LIBINCLUDE) main.cpp /link $(LIBS) $(LIBPATH) /OUT:$(BIN)
 
 clean:
