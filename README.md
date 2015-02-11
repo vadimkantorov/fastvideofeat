@@ -48,7 +48,7 @@ Option | Description
 
 The output format (also reminded on standard error):
 
-   ```#Descriptor format: xnorm ynorm tnorm pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight hog (dim. 96) hof (dim. 108) mbhx (dim. 96) mbhy(dim. 96)```
+   ```#Descriptor format: xnorm ynorm tnorm pts StartPTS EndPTS Xoffset Yoffset PatchWidth PatchHeight hog (dim. 96) hof (dim. 108) mbhx (dim. 96) mbhy (dim. 96)```
 
   + **xnorm** and **ynorm** are the normalized frame coordinates of the spatio-temporal (s-t) patch  
   + **tnorm** and **pts** are the normalized and unnormalized frame number of the s-t patch center  
