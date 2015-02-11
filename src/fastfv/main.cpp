@@ -145,6 +145,7 @@ int main(int argc, char* argv[])
 {
 	TIMERS.Total.Start();
 	Options opts(argc, argv);
+	setNumThreads(1);
 	vector<Part>& parts = opts.Parts;
 	
 	TIMERS.Vocab.Start();

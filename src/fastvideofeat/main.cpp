@@ -58,6 +58,7 @@ struct Options
 int main(int argc, char* argv[])
 {
 	Options opts(argc, argv);
+	setNumThreads(1);
 
 	const int nt_cell = 3;
 	const int tStride = 5;
