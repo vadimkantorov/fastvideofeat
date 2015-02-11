@@ -31,11 +31,7 @@ for p in args.vocab:
 	
 	print >> sys.stderr, '%d-%d: {d: %d, k: %d, fvSize: %d}' % (cutFrom, cutTo, gmm.d, gmm.k, fvSize);
 
-if args.enablespatiotemporalgrids:
-	nx, ny, nt = 1, 3, 2
-else:
-	nx, ny, nt = 1, 1, 1
-
+nx, ny, nt = (1, 3, 2) if args.enablespatiotemporalgrids else (1, 1, 1)
 nxyt = nx * ny * nt
 mesh = list(itertools.product(range(nx), range(ny), range(nt)))
 
