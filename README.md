@@ -100,11 +100,11 @@ Examples are explained in *samples/compute_fisher_vector.sh*.
 ##### Performance
 We haven't observed enabling second order boosts accuracy, so it's disabled by default. Enabling second order part increases Fisher vector size twice.
 
-Using simple knn descriptor attribution (default) beats FLANN in speed by a factor of two, however leads to ~1% accuracy degradation in spatio-temporal grids regime. However it's enabled by default because of its speed. 
+Using simple knn descriptor attribution (default) beats FLANN in speed by a factor of two, yet leads to <1% accuracy degradation. It's enabled by default because of its speed. 
 
-Enabling spatio-temporal grids (disabled by default) is important for maximum accuracy (~2% gain), so it's enabled by default.
+Enabling spatio-temporal grids (disabled by default) is important for maximum accuracy (~2% gain).
 
-The FLANN parameter that influences speeed is the number of checks, try reducing it to gain speed.
+If you use FLANN, it's the number of checks that defines speed, try reducing it to gain speed.
 
 # Building from source
 
