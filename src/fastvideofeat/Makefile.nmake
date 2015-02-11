@@ -1,5 +1,5 @@
-OPENCV_DIR = ../bin/dependencies/opencv/build
-FFMPEG_DIR = ../bin/dependencies/ffmpeg-2.4.5-win64-dev
+OPENCV_DIR = ../../bin/dependencies/opencv/build
+FFMPEG_DIR = ../../bin/dependencies/ffmpeg-2.4.5-win64-dev
 VC_VERSION = vc12
 OPENCV_ARCH = x64
 
