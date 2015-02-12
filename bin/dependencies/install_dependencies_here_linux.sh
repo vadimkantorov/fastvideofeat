@@ -1,8 +1,6 @@
 # This script will try to download and install from sources opencv 2.4.9 (with minimal set of modules), ffmpeg 2.4, yasm 1.3.0 (required by ffmpeg), yael 4.38, ATLAS 3.10.2 and LAPACK 3.5.0 (required by yael).
 # I cannot guarantee it will work on absolutely all systems, hopefully it still provides guidance.
 
-mkdir -p dependencies && cd dependencies
-
 wget http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
 tar -xf yasm-1.3.0.tar.gz
 cd yasm-1.3.0
