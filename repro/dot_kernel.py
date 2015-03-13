@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 
+import os
 import sys
 import itertools
 import numpy as np
 import numpy.linalg as linalg
 
-IN = sys.argv[1:]
+IN = [os.path.join(sys.argv[1], x[:-1] + '.txt') for x in open(sys.argv[2])]
 
 skipComments = lambda path: itertools.ifilter(lambda x: not x.startswith('#'), open(path))
 ks = [None]*len(list(skipComments(IN[0])))

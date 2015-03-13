@@ -22,7 +22,6 @@ struct Diag
 	Timer HogQuerying;
 
 	Timer Everything;
-	Timer Reading;
 	Timer ReadingAndDecoding;
 	Timer Writing;
 
@@ -33,8 +32,7 @@ struct Diag
 
 	void Print(int frameCount)
 	{
-		log("Reading (sec): %.2lf", Reading.TotalInSeconds());
-		log("Decoding (sec): %.2lf", ReadingAndDecoding.TotalInSeconds() - Reading.TotalInSeconds());
+		log("Reading (sec): %.2lf", ReadingAndDecoding.TotalInSeconds());
 
 		log("Interp (sec): {total: %.2lf, HOG: %.2lf, HOFMBH: %.2lf}",
 			InterpolationHOFMBH.TotalInSeconds() + InterpolationHOG.TotalInSeconds(),

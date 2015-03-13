@@ -70,9 +70,9 @@ int main(int argc, char* argv[])
 	DescInfo mbhInfo(8, false, nt_cell, opts.MbhEnabled);
 	DescInfo hogInfo(8, false, nt_cell, opts.HogEnabled);
 
-	TIMERS.Reading.Start();
+	TIMERS.ReadingAndDecoding.Start();
 	FrameReader rdr(opts.VideoPath, hogInfo.enabled);
-	TIMERS.Reading.Stop();
+	TIMERS.ReadingAndDecoding.Stop();
 
 	Size frameSizeAfterInterpolation = 
 		opts.Interpolation

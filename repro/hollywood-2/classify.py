@@ -9,7 +9,7 @@ from sklearn.cross_validation import StratifiedKFold
 from sklearn.svm import SVC
 from oct2py import octave
 
-EVAL_DIR, allClipsNoExt = sys.argv[1], sys.argv[2:]
+EVAL_DIR, allClipsNoExt = sys.argv[1], map(lambda l: os.path.splitext(l[:-1])[0], open(sys.argv[2]))
 all_k = np.loadtxt(sys.stdin)
 
 CS = np.logspace(-6, 2, 10)
@@ -60,4 +60,4 @@ for CLS_LAB in classLabels:
 	aps.append(test_ap)
 	print '%-15s: %.4f' % (CLS_LAB, test_ap)
 
-print '\nmAP: %.4f' % np.mean(aps)
+print '\nmean: %.4f' % np.mean(aps)

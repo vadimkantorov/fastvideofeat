@@ -68,18 +68,6 @@ struct FrameReader
 	AVFrame rgb_picture;
 	int videoStream;
 
-	static int avio_readPacket(void* opaque, uint8_t* buf, int buf_size)
-	{
-		TIMERS.Reading.Start();
-		int res = fread(buf, 1, buf_size, (FILE*)opaque);
-		TIMERS.Reading.Stop();
-		return res;
-	}
-
-	static void av_null_log_callback(void*, int, const char*, va_list)
-	{
-	}
-
 	void print_ffmpeg_error(int err) // copied from cmdutils.c
 	{
 		char errbuf[128];
@@ -102,24 +90,6 @@ struct FrameReader
 
 		av_register_all();
 
-		bool readWholeFileInMemory = false; // disabling for now. possibly manual probing is needed when using custom IO: http://cdry.wordpress.com/2009/09/09/using-custom-io-callbacks-with-ffmpeg/
-		if(readWholeFileInMemory)
-		{
-			const int bufSize = 20* (1 << 20);
-			pAvio_buffer = (uint8_t*)av_malloc(bufSize);
-			FILE* in = fopen(videoPath.c_str(), "rb");
-			pAvioContext = avio_alloc_context(
-				pAvio_buffer,
-				bufSize,
-				false,
-				in,
-				avio_readPacket,
-				NULL,
-				NULL);
-
-			videoPath = "dummyFileName";
-			pFormatCtx->pb = pAvioContext;
-		}
 		int err = 0;
 
 		if ((err = avformat_open_input(&pFormatCtx, videoPath.c_str(), NULL, NULL)) != 0)
