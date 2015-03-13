@@ -15,7 +15,7 @@ If you use this code, please cite our work:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;year = {2014}  
 }
 
-The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository, the binaries are published on the repository [releases page](http://github.com/vadimkantorov/cvpr2014/releases), the Hollywood-2 repro scripts are in the [repro directory] (http://github.com/vadimkantorov/cvpr2014/tree/master/repro/).
+The paper and the poster are available at the [project webpage](http://www.di.ens.fr/willow/research/fastvideofeat) or in this repository, the binaries are published on the repository [releases page](http://github.com/vadimkantorov/cvpr2014/releases), the Hollywood-2 and HMDB-51 repro scripts are in the [repro directory] (http://github.com/vadimkantorov/cvpr2014/tree/master/repro/).
 
 Please submit bugs on [GitHub](http://github.com/vadimkantorov/cvpr2014/issues) directly.
 
@@ -26,7 +26,7 @@ For any other question, please contact Vadim Kantorov at vadim.kantorov@inria.fr
 
 We release two tools in this repository. The first tool **fastvideofeat** is a motion feature extractor based on motion vectors from video compression information. The second is a fast Fisher vector computation tool **fastfv** that uses vector SSE2 CPU instructions.
 
-We also release scripts (in the *repro* directory) for reproducing our results on Hollywood-2 dataset.
+We also release scripts (in the *repro* directory) for reproducing our results on Hollywood-2 dataset and on HMDB-51 dataset.
 
 All code is released under the [MIT license](http://github.com/vadimkantorov/cvpr2014/blob/master/LICENSE).
 
