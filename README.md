@@ -66,13 +66,13 @@ Every line on standard output corresponds to an extracted descriptor of a patch 
   - Compute only HOF and MBH from the first 600 frames and save the descriptors in descriptors.txt:
     > $ ./fastvideofeat video.avi --disableHOG -f 1-600 > descriptors.txt
 
-More examples in *samples/compute_mpeg_features.sh*.
+More examples in *examples/compute_mpeg_features.sh*.
 
 ##### Video format support
 We've tested **fastvideofeat** only videos encoded in H.264 and MPEG-4. Whether motion vectors can be extracted and processed depends completely on FFmpeg's ability to put them into the right structures. Last time I've checked it was not working for VP9, for example. And in general, video reading depends fully on FFmpeg libraries.
 
 ### fastfv
-The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by Yael library. A [sample script](https://github.com/vadimkantorov/cvpr2014/blob/master/src/gmm_train.py) to build GMM vocabs with Yael is provided, as well as its [usage example](https://github.com/vadimkantorov/cvpr2014/blob/master/samples/compute_fisher_vectors.sh).
+The tool accepts descriptors on the standard input and writes Fisher vector (FV) to the standard output. The tool consumes GMM vocabs saved by Yael library. A [sample script](https://github.com/vadimkantorov/cvpr2014/blob/master/src/gmm_train.py) to build GMM vocabs with Yael is provided, as well as its [usage example](https://github.com/vadimkantorov/cvpr2014/blob/master/examples/compute_fisher_vectors.sh).
 
 **IMPORTANT** The computed Fisher vectors are non-normalized, apply signed square rooting / power normalization, L2-normalization, clipping etc before training a classifier.
 ##### Command-line options:
@@ -95,7 +95,7 @@ Option | Description
   - Build GMM vocab with Yael:
     > $ PYTHONPATH=$(pwd)/../bin/dependencies/yael/yael:$PYTHONPATH cat features*.gz | ../src/gmm_train.py --gmm_ncomponents 256 --vocab 10-105 10-105.hog.gmm
 
-Examples are explained in *samples/compute_fisher_vector.sh*.
+Examples are explained in *examples/compute_fisher_vector.sh*.
 
 ##### Performance
 We haven't observed enabling second order boosts accuracy, so it's disabled by default. Enabling second order part increases Fisher vector size twice.
