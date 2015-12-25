@@ -1,0 +1,249 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Efficient feature extraction, encoding and classification for action recognition</title> 
+<script type="text/javascript">
+
+//Tracking Code Customizations Only
+//var _gaq = _gaq || [];
+//_gaq.push(['_setAccount', 'UA-28335121-2']);
+//_gaq.push(['_setDomainName', 'none']);
+//_gaq.push(['_setCookiePath', 'projects/peopleWatching/']);
+//_gaq.push(['_trackPageview']); 
+//_gaq.push(['_setAllowLinker',true]);
+
+//(function() {
+// var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+// ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+// var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+// })();
+</script>
+<style type="text/css">
+body {
+  background-color: white;
+  color: black;
+  text-align:center;
+}
+
+
+#primarycontent a:link {
+    color: #009;
+    text-decoration: none;
+}
+
+#primarycontent a:visited {
+    color: #00F;
+    text-decoration: none;
+    /*color: #8d9345; */
+}
+
+#primarycontent a:hover {
+    text-decoration: underline;
+}
+
+#people {
+	list-style-type: none;
+	margin-left: 0px;
+	padding-left: 10px;
+}
+
+#primarycontent {
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+.index {
+  max-width: 800px;
+  width: expression(document.body.clientWidth > 800? "800px": "auto" );
+}
+
+.segmentations {
+  max-width: 1200px;
+  width: expression(document.body.clientWidth > 1200 ? "1200px" : "auto" );
+}
+
+.weights {
+
+#primarycontent h1 {
+	font-variant: small-caps;
+}
+#primarycontent h3 {
+}
+#primarycontent teasertext {
+	text-align: center;
+}
+#primarycontent p {
+	text-align: center;
+}
+#primarycontent {
+	text-align: justify;
+}
+#primarycontent p {
+	text-align: justify;
+}
+#primarycontent p iframe {
+	text-align: center;
+}
+</style>
+</head> 
+<body>
+<div id="primarycontent" class="index"> 
+<h1 align="center" itemprop="name"><strong>Efficient feature extraction, encoding and classification for action recognition</strong></h1> 
+<img src="teaser.jpg" itemprop="image" width="400" alt="teaserImage" align="center" style="display: block; margin-left: auto; margin-right: auto"></a>
+<h3>People</h3>
+
+<ul id="people">
+<li><a href="http://www.vadimkantorov.com">Vadim Kantorov</a></li>
+<li><a href="http://www.di.ens.fr/~laptev/index.html">Ivan Laptev</a></li>
+</ul>
+<h3>Abstract</h3>
+
+<p style="padding-left: 10px;	padding-right: 10px;">
+Local video features provide state-of-the-art performance
+for action recognition. While the accuracy of action recognition
+has been continuously improved over the recent
+years, the low speed of feature extraction and subsequent
+recognition prevents current methods from scaling up to
+real-size problems. We address this issue and first develop
+highly efficient video features using motion information in
+video compression. We next explore feature encoding by
+Fisher vectors and demonstrate accurate action recognition using fast linear classifiers. Our method improves the
+speed of video feature extraction, feature encoding and action classification by two orders of magnitude at the cost of
+minor reduction in recognition accuracy. We validate our
+approach and compare it to the state of the art on four recent action recognition datasets.
+</p>
+
+<h3>Paper</h3>
+<p style="padding-left: 10px;	padding-right: 10px;">
+<table>
+<tr><td>
+ <a href="paper/cvpr2014_kantorov_paper.pdf">
+<img src="preview_small.png"/ border='0px'><!-- convert -density 300 ../paper/cvpr2014_final.pdf[0] -resize 10% preview_small.png -->
+</a>
+</td><td>
+<a href="paper/cvpr2014_kantorov_paper.pdf">CVPR paper</a><!-- / <a href="delaitre_ECCV12_poster.pdf">Poster</a>--><br/> 
+<a href="paper/cvpr2014_kantorov_poster.pdf">CVPR poster</a>
+<p style="width:500"><span style="font-size:4px;">&nbsp;<br/></span> 
+<b>Efficient feature extraction, encoding and classification for action recognition.</b>
+Vadim Kantorov, Ivan Laptev <i>In Proc. Computer Vision and Pattern Recognition (CVPR), IEEE, 2014.</i>
+</p>
+<p>
+<pre style="width:500; te">@inproceedings{kantorov2014,
+  author = {Kantorov, V. and Laptev, I.},
+  title = {Efficient feature extraction, encoding and classification for action recognition},
+  booktitle = {Proc. Computer Vision and Pattern Recognition (CVPR), IEEE, 2014},
+  year = {2014},
+}</pre>
+</p>
+</td></tr>
+</table>
+</p>
+
+<a name="code"></a>
+<h3 style="clear:both">Code</h3>
+<p style="padding-left: 10px; padding-right:10px;">
+	The code for MPEG flow-based descriptors and fast Fisher vector signatures is available on <a href="https://github.com/vadimkantorov/cvpr2014">GitHub</a>.
+</p>
+<h3 style="clear:both">Datasets</h3>
+<p style="padding-left: 10px; padding-right:10px;">
+<ul>
+<li><a href="http://www.di.ens.fr/~laptev/actions/hollywood2/"><em>Hollywood-2 dataset website</em></a></li><br/>
+<li><a href="http://crcv.ucf.edu/data/UCF50.php"><em>UCF-50 dataset website</em></a></li><br/>
+<li><a href="http://serre-lab.clps.brown.edu/resource/hmdb-a-large-human-motion-database/"><em>HMDB-51 dataset website</em></a></li><br/>
+<li><a href="http://cvrc.ece.utexas.edu/SDHA2010/Human_Interaction.html"><em>UT-Interaction dataset website</em></a></li><br/>
+</ul>
+</p>
+
+<!--<h3 style='clear:both'>Extended Results</h3>
+<p style='padding-left: 10px; padding-right: 10px;'>
+<ul>
+<li><a href="segmentations.html"><em>Segmentation results for different method over all videos.</em>
+<br/><br/>
+<table>
+<tr>
+<td><img src="img/Yx0t6CBvTRw.2_back.jpg" width="100%"/></td>
+<td><img src="img/Yx0t6CBvTRw.2_geomobjects_truth.jpg" width="100%"/></td>
+<td><img src="img/ALP_Yx0t6CBvTRw.2_geomobjects_mean.jpg" width="100%"/></td>
+</tr>
+<tr>
+<td><img src="img/AE4_Cx2h99I_back.jpg" width="100%"/></td>
+<td><img src="img/AE4_Cx2h99I_geomobjects_truth.jpg" width="100%"/></td>
+<td><img src="img/ALP_AE4_Cx2h99I_geomobjects_mean.jpg" width="100%"/></td>
+</tr>
+<tr>
+<td><img src="img/coFRfba0uHg_back.jpg" width="100%"/></td>
+<td><img src="img/coFRfba0uHg_geomobjects_truth.jpg" width="100%"/></td>
+<td><img src="img/ALP_coFRfba0uHg_geomobjects_mean.jpg" width="100%"/></td>
+</tr>
+</table>
+<br/><br/>
+</a></li>
+<li><a href="weights.html"><em>Spatial locations of objects relative to the 6 most contributing poses for all labels:</em><br/><br/>
+<table>
+<tr><td>Sofa / Armchair</td>
+<td width="15%"><img src="img/SofaArmchair_pose26.jpg" width="100%"/></td>
+<td width="15%"><img src="img/SofaArmchair_pose17.jpg" width="100%"/></td>
+<td width="15%"><img src="img/SofaArmchair_pose19.jpg" width="100%"/></td>
+<td width="15%"><img src="img/SofaArmchair_pose29.jpg" width="100%"/></td>
+<td width="15%"><img src="img/SofaArmchair_pose2.jpg" width="100%"/></td>
+<td width="15%"><img src="img/SofaArmchair_pose12.jpg" width="100%"/></td>
+</tr>
+<tr><td>Table</td>
+<td width="15%"><img src="img/Table_pose3.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Table_pose21.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Table_pose32.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Table_pose22.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Table_pose18.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Table_pose23.jpg" width="100%"/></td>
+</tr>
+<tr><td>Cupboard</td>
+<td width="15%"><img src="img/Cupboard_pose25.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Cupboard_pose32.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Cupboard_pose2.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Cupboard_pose23.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Cupboard_pose20.jpg" width="100%"/></td>
+<td width="15%"><img src="img/Cupboard_pose16.jpg" width="100%"/></td>
+</tr>
+</table>
+</a></li></ul>
+</p>
+
+<h3 style="clear:both">Related Works</h3>
+<p style="padding-left:10px; padding-right:10px;">
+<a href="http://graphics.cs.cmu.edu/projects/peopleWatching/">
+D. Fouhey, V. Delaitre, A. Gupta, A. Efros, I. Laptev and J. Sivic<br/>
+People Watching: Human Actions as a Cue for Single-View Geometry.<br/>
+In Proc. ECCV  2012.
+</a>
+</p>-->
+
+
+<h3 style="clear:both">Funding</h3>
+<p style="padding-left: 10px; padding-right: 10px;">
+This research project is supported by Quaero and MSR-INRIA.
+</p>
+
+
+<h3 style="clear:both">Copyright Notice</h3>
+<p style="padding-left: 10px; padding-right: 10px;">
+The documents contained in these directories are included by the 
+contributing authors as a means to ensure timely dissemination 
+of scholarly and technical work on a non-commercial basis. 
+Copyright and all rights therein are maintained by the authors 
+or by other copyright holders, notwithstanding that they have 
+offered their works here electronically. It is understood that 
+all persons copying this information will adhere to the terms 
+and constraints invoked by each author's copyright.
+</p>
+
+</div>
+</body>
+</html>
+
